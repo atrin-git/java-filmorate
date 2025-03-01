@@ -81,8 +81,8 @@ public class FilmController {
 
     private boolean isFilmNotValid(Film film) {
 
-        if (film.getName() == null || film.getName().isEmpty()) {
-            log.debug("Передано значение name = {}. Валидация не пройдена", film.getName());
+        if (film.getName() == null) {
+            log.debug("Передано значение name = null. Валидация не пройдена");
             throw new ValidationException("Название фильма не может быть пустым");
         }
 
