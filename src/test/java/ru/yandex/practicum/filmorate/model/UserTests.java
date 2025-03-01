@@ -5,7 +5,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 public class UserTests {
@@ -16,7 +16,7 @@ public class UserTests {
                 .name("name")
                 .login("login")
                 .email("e@mail.ru")
-                .birthday(LocalDate.of(1990,1,1))
+                .birthday(LocalDate.of(1990, 1, 1))
                 .build();
 
         assertNotNull(user);

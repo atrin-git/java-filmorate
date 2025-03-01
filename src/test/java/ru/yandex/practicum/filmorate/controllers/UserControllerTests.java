@@ -7,14 +7,17 @@ import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exception.DuplicateException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static ru.yandex.practicum.filmorate.utils.GenerateTestData.*;
+import static ru.yandex.practicum.filmorate.utils.GenerateTestData.generateNewUser;
+import static ru.yandex.practicum.filmorate.utils.GenerateTestData.generateString;
 
 @SpringBootTest
 class UserControllerTests {
@@ -271,6 +274,7 @@ class UserControllerTests {
 
         assertFalse(userController.findAll().contains(user));
     }
+
     @Test
     public void checkUpdateIdNotFound() {
         User user = generateNewUser(testUsers.keySet());

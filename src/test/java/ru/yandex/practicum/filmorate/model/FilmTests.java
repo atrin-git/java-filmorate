@@ -6,7 +6,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.Duration;
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
@@ -17,7 +16,7 @@ public class FilmTests {
                 .id(1L)
                 .name("name")
                 .description("description")
-                .releaseDate(LocalDate.of(1990,1,1))
+                .releaseDate(LocalDate.of(1990, 1, 1))
                 .duration(Duration.ofHours(2))
                 .build();
 

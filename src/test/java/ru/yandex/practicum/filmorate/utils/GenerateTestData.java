@@ -24,13 +24,14 @@ public class GenerateTestData {
     public static User generateNewUser(Collection<Long> ids, int emailLength, int nameLength, int loginLength, LocalDate birthday) {
         return User.builder()
                 .id(getNextId(ids))
-                .email(generateString(emailLength/2) + "@" + generateString(emailLength/2) )
+                .email(generateString(emailLength / 2) + "@" + generateString(emailLength / 2))
                 .name(generateString(nameLength))
                 .login(generateString(loginLength))
                 .birthday(birthday)
                 .build();
 
     }
+
     public static Film generateNewFilm(Collection<Long> ids) {
         return generateNewFilm(ids,
                 10,
