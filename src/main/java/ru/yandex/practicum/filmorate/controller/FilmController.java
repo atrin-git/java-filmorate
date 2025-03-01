@@ -96,7 +96,7 @@ public class FilmController {
             throw new ValidationException("Фильмы до " + FIRST_FILM_DATE + " не существовали");
         }
 
-        if (film.getDuration() != null && !film.getDuration().isPositive()) {
+        if (film.getDuration() != null && film.getDuration() <= 0) {
             log.debug("Передано значение duration = {}. Валидация не пройдена", film.getDuration());
             throw new ValidationException("Продолжительность фильма должна быть больше 0");
         }

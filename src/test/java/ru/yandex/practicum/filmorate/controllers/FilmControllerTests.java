@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.time.Duration;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -95,7 +94,7 @@ class FilmControllerTests {
     @Test
     public void checkCreateFilmDurationIsZero() {
         Film film = generateNewFilm(testFilms.keySet());
-        film.setDuration(Duration.ZERO);
+        film.setDuration(0);
 
         assertThrows(ValidationException.class,
                 () -> filmController.create(film),
@@ -106,7 +105,7 @@ class FilmControllerTests {
     @Test
     public void checkCreateFilmDurationIsNegative() {
         Film film = generateNewFilm(testFilms.keySet());
-        film.setDuration(Duration.ofSeconds(-1));
+        film.setDuration(-1);
 
         assertThrows(ValidationException.class,
                 () -> filmController.create(film),

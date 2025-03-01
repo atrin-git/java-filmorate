@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.model;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.time.Duration;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -17,7 +16,7 @@ public class FilmTests {
                 .name("name")
                 .description("description")
                 .releaseDate(LocalDate.of(1990, 1, 1))
-                .duration(Duration.ofHours(2))
+                .duration(200)
                 .build();
 
         assertNotNull(film);

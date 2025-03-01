@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.utils;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Random;
@@ -37,11 +36,11 @@ public class GenerateTestData {
                 10,
                 30,
                 LocalDate.of(2014, 1, 1),
-                Duration.ofMinutes(120)
+                120
         );
     }
 
-    public static Film generateNewFilm(Collection<Long> ids, int nameLength, int descLength, LocalDate date, Duration duration) {
+    public static Film generateNewFilm(Collection<Long> ids, int nameLength, int descLength, LocalDate date, int duration) {
         return Film.builder()
                 .id(getNextId(ids))
                 .name(generateString(nameLength))
