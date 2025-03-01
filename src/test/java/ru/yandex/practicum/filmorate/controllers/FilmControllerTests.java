@@ -60,6 +60,18 @@ class FilmControllerTests {
     }
 
     @Test
+    public void checkCreateFilmNameIsEmpty() {
+        Film film = generateNewFilm(testFilms.keySet());
+        film.setName("");
+
+        assertThrows(ValidationException.class,
+                () -> filmController.create(film),
+                "Ожидалось исключение типа " + ValidationException.class);
+
+        assertFalse(filmController.findAll().contains(film));
+    }
+
+    @Test
     public void checkCreateFilmDescriptionLengthEquals200() {
         Film film = generateNewFilm(testFilms.keySet());
         film.setDescription(generateString(200));
