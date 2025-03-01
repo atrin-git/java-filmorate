@@ -28,31 +28,31 @@ public class UserControllerExceptionHandlersTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
     private final Map<Long, Film> testUsers = new HashMap<>();
-    private final String URL = "/users";
+    private final String url = "/users";
 
     @Test
     public void checkFindAllCodeIsSuccess() throws Exception {
-        mockMvc.perform(get(URL))
+        mockMvc.perform(get(url))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void checkCreateCodeIsBadRequest() throws Exception {
-        mockMvc.perform(post(URL))
+        mockMvc.perform(post(url))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     public void checkCreateCodeIsConflict() throws Exception {
         User user = generateNewUser(Collections.singleton(0L));
-        mockMvc.perform(post(URL)
+        mockMvc.perform(post(url)
                 .content(objectMapper.writeValueAsString(user))
                 .contentType(MediaType.APPLICATION_JSON));
 
         User newUser = generateNewUser(Collections.singleton(1L));
         newUser.setEmail(user.getEmail());
 
-        mockMvc.perform(post(URL)
+        mockMvc.perform(post(url)
                         .content(objectMapper.writeValueAsString(newUser))
                         .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -64,7 +64,7 @@ public class UserControllerExceptionHandlersTest {
         User user = generateNewUser(testUsers.keySet());
         user.setId(10L);
 
-        mockMvc.perform(put(URL)
+        mockMvc.perform(put(url)
                         .content(objectMapper.writeValueAsString(user))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());

@@ -26,31 +26,31 @@ public class FilmControllerExceptionHandlersTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
     private final Map<Long, Film> testFilms = new HashMap<>();
-    private final String URL = "/films";
+    private final String url = "/films";
 
     @Test
     public void checkFindAllCodeIsSuccess() throws Exception {
-        mockMvc.perform(get(URL))
+        mockMvc.perform(get(url))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void checkCreateCodeIsBadRequest() throws Exception {
-        mockMvc.perform(post(URL))
+        mockMvc.perform(post(url))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     public void checkCreateCodeIsConflict() throws Exception {
         Film film = generateNewFilm(Collections.singleton(0L));
-        mockMvc.perform(post(URL)
+        mockMvc.perform(post(url)
                 .content(objectMapper.writeValueAsString(film))
                 .contentType(MediaType.APPLICATION_JSON));
 
         Film newFilm = generateNewFilm(Collections.singleton(1L));
         newFilm.setName(film.getName());
 
-        mockMvc.perform(post(URL)
+        mockMvc.perform(post(url)
                         .content(objectMapper.writeValueAsString(newFilm))
                         .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -62,7 +62,7 @@ public class FilmControllerExceptionHandlersTest {
         Film film = generateNewFilm(testFilms.keySet());
         film.setId(10L);
 
-        mockMvc.perform(put(URL)
+        mockMvc.perform(put(url)
                         .content(objectMapper.writeValueAsString(film))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
