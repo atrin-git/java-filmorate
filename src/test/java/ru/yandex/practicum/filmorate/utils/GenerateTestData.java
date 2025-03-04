@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Random;
 
-import static ru.yandex.practicum.filmorate.utils.IdentityUtil.getNextId;
+import static ru.yandex.practicum.filmorate.utils.ControllersUtils.getNextId;
 
 public class GenerateTestData {
 

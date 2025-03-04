@@ -138,13 +138,13 @@ class UserControllerTests {
         User user = generateNewUser(testUsers.keySet());
         user.setLogin(" " + user.getLogin());
 
-        assertThrows(ValidationException.class,
-                () -> userController.create(user),
-                "Ожидалось исключение типа " + ValidationException.class);
+        assertDoesNotThrow(() -> userController.create(user),
+                "Не ожидалось исключений");
 
         Collection<User> actualUsers = userController.findAll();
 
-        assertTrue(actualUsers.isEmpty());
+        assertTrue(actualUsers.contains(user));
+        assertEquals(1, actualUsers.size());
     }
 
     @Test
@@ -152,13 +152,13 @@ class UserControllerTests {
         User user = generateNewUser(testUsers.keySet());
         user.setLogin(user.getLogin() + " ");
 
-        assertThrows(ValidationException.class,
-                () -> userController.create(user),
-                "Ожидалось исключение типа " + ValidationException.class);
+        assertDoesNotThrow(() -> userController.create(user),
+                "Не ожидалось исключений");
 
         Collection<User> actualUsers = userController.findAll();
 
-        assertTrue(actualUsers.isEmpty());
+        assertTrue(actualUsers.contains(user));
+        assertEquals(1, actualUsers.size());
     }
 
     @Test
