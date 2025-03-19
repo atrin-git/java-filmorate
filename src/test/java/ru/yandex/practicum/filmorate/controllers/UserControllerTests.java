@@ -8,6 +8,9 @@ import ru.yandex.practicum.filmorate.exception.DuplicateException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.validation.UserValidator;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.inmemory.InMemoryUserStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -27,7 +30,12 @@ class UserControllerTests {
 
     @BeforeEach
     public void setUp() {
-        userController = new UserController();
+        userController = new UserController(
+                new UserService(
+                        new InMemoryUserStorage(),
+                        new UserValidator()
+                )
+        );
     }
 
     @Test

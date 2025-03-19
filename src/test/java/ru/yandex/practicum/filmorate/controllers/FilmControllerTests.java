@@ -8,12 +8,17 @@ import ru.yandex.practicum.filmorate.exception.DuplicateException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.validation.FilmValidator;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.inmemory.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.inmemory.InMemoryUserStorage;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static ru.yandex.practicum.filmorate.model.validation.FilmValidator.FIRST_FILM_DATE;
 import static ru.yandex.practicum.filmorate.utils.GenerateTestData.generateNewFilm;
 import static ru.yandex.practicum.filmorate.utils.GenerateTestData.generateString;
 
@@ -25,7 +30,12 @@ class FilmControllerTests {
 
     @BeforeEach
     public void setUp() {
-        filmController = new FilmController();
+        filmController = new FilmController(
+                new FilmService(
+                        new InMemoryFilmStorage(),
+                        new InMemoryUserStorage(),
+                        new FilmValidator()
+                ));
     }
 
     @Test
@@ -95,7 +105,7 @@ class FilmControllerTests {
     @Test
     public void checkCreateFilmReleaseDateBeforeFirstFilmDate() {
         Film film = generateNewFilm(testFilms.keySet());
-        film.setReleaseDate(FilmController.FIRST_FILM_DATE.minusDays(1));
+        film.setReleaseDate(FIRST_FILM_DATE.minusDays(1));
 
         assertThrows(ValidationException.class,
                 () -> filmController.create(film),

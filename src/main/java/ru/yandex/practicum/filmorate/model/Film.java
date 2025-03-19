@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @Builder(toBuilder = true)
@@ -13,4 +14,5 @@ public class Film {
     private String description;
     private LocalDate releaseDate;
     private Integer duration;
+    private Set<Long> likesByUsers;
 }

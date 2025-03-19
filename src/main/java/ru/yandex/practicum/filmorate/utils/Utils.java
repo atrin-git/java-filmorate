@@ -4,7 +4,7 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collection;
 
-public class ControllersUtils {
+public class Utils {
     public static Long getNextId(Collection<Long> ids) {
         long maxId = ids.stream()
                 .mapToLong(id -> id)
