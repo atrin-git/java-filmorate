@@ -28,6 +28,7 @@ public class ErrorHandler {
     public ErrorResponseTemplate handleNotFoundException(final NotFoundException e) {
         return new ErrorResponseTemplate(e.getMessage());
     }
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponseTemplate handleIllegalArgumentException(final IllegalArgumentException e) {
