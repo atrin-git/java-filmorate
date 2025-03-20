@@ -55,6 +55,12 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
+    public void deleteAll() {
+        users.clear();
+        userEmails.clear();
+    }
+
+    @Override
     public User update(User user) {
         if (find(user.getId()) == null) {
             return null;

@@ -10,6 +10,8 @@ public interface UserStorage {
 
     void delete(Long id);
 
+    void deleteAll();
+
     User update(User user);
 
     User find(Long id);

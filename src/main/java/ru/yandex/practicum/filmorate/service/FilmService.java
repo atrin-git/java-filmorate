@@ -35,7 +35,7 @@ public class FilmService {
     }
 
     public void deleteAll() {
-        filmStorage.getAll().stream().map(Film::getId).forEach(filmStorage::delete);
+        filmStorage.deleteAll();
     }
 
     public void addLike(Long filmId, Long userId) {

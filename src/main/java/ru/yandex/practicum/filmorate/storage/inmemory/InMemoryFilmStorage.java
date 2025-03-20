@@ -50,6 +50,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public void deleteAll() {
+        films.clear();
+        filmNames.clear();
+    }
+
+    @Override
     public Film update(Film film) {
         if (film.getId() == null || film.getId() <= 0) {
             log.warn("Передано значение id = {}. Обновление прерывается", film.getId());

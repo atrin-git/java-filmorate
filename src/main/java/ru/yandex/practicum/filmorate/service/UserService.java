@@ -35,7 +35,7 @@ public class UserService {
     }
 
     public void deleteAll() {
-        userStorage.getAll().stream().map(User::getId).forEach(userStorage::delete);
+        userStorage.deleteAll();
     }
 
     public Collection<User> getFriends(Long userId) {
