@@ -1,109 +1,67 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.DuplicateException;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.time.LocalDate;
-import java.util.*;
+import java.util.Collection;
 
-import static ru.yandex.practicum.filmorate.utils.ControllersUtils.clearStringData;
-import static ru.yandex.practicum.filmorate.utils.ControllersUtils.getNextId;
+import static ru.yandex.practicum.filmorate.utils.Utils.clearStringData;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
 
-    private final Map<Long, User> users = new HashMap<>();
-    private final Set<String> userEmails = new HashSet<>();
+    private final UserService userService;
 
     @GetMapping
     public Collection<User> findAll() {
-        return users.values();
+        return userService.findAll();
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public User create(@RequestBody User user) {
-
-        log.info("Начинаем добавление пользователя");
-
+        log.info("Получен запрос на добавление пользователя");
         clearStringData(user);
-        checkUserIsValid(user);
-
-        if (userEmails.contains(user.getEmail().toLowerCase())) {
-            log.warn("Пользователь с email = {} уже был добавлен", user.getEmail());
-            throw new DuplicateException("Пользователь с такой электронной почтой уже был добавлен");
-        }
-
-        if (user.getName() == null || user.getName().isEmpty()) {
-            log.info("Имя пользователя не задано. Дублируем в имя логин.");
-            user.setName(user.getLogin());
-        }
-
-        userEmails.add(user.getEmail().toLowerCase());
-        user.setId(getNextId(users.keySet()));
-        users.put(user.getId(), user);
-
-        log.info("Пользователь c email = {} добавлен", user.getEmail());
-
-        return user;
+        return userService.create(user);
     }
 
     @PutMapping
     public User update(@RequestBody User user) {
-
-        log.info("Начинаем обновление пользователя с id = {}", user.getId());
-
-        if (user.getId() == null || user.getId() <= 0) {
-            log.warn("Передано значение id = {}. Обновление прерывается", user.getId());
-            throw new ValidationException("Идентификатор пользователя должен быть определён и положительным");
-        }
-
+        log.info("Получен запрос на обновление пользователя с id = {}", user.getId());
         clearStringData(user);
-        checkUserIsValid(user);
-
-        if (!users.containsKey(user.getId())) {
-            log.warn("Пользователь с id = {} не найден", user.getId());
-            throw new NotFoundException("Пользователь с id = " + user.getId() + " не найден");
-        }
-
-        // Случай, когда при обновлении меняется email и нужно удалить старый из коллекции email-ов
-        final User oldUser = users.get(user.getId());
-        if (!oldUser.getEmail().equalsIgnoreCase(user.getEmail())) {
-            userEmails.remove(oldUser.getName().toLowerCase());
-            userEmails.add(user.getEmail().toLowerCase());
-        }
-
-        users.put(user.getId(), user);
-
-        log.info("Пользователь с id = {} обновлён", user.getId());
-
-        return user;
+        return userService.update(user);
     }
 
-    private static void checkUserIsValid(User user) {
-        try {
-            if (user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
-                log.debug("Передано значение email = {}. Валидация не пройдена", user.getEmail());
-                throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
-            }
+    @GetMapping("/{id}/friends")
+    public Collection<User> getFriends(@PathVariable("id") Long userId) {
+        log.info("Получен запрос за получение списка друзей пользователя {}", userId);
+        return userService.getFriends(userId);
+    }
 
-            if (user.getLogin() == null || user.getLogin().isEmpty() || user.getLogin().contains(" ")) {
-                log.debug("Передано значение login = {}. Валидация не пройдена", user.getLogin());
-                throw new ValidationException("Логин не может быть пустым и содержать пробелы");
-            }
+    @PutMapping("/{id}/friends/{friendId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void addFriend(@PathVariable("id") Long userId, @PathVariable("friendId") Long friendId) {
+        log.info("Получен запрос за добавление в друзья к {} пользователя {}", userId, friendId);
+        userService.addFriend(userId, friendId);
+    }
 
-            if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
-                log.debug("Передано значение birthday = {}. Валидация не пройдена", user.getBirthday());
-                throw new ValidationException("Дата рождения не может быть в будущем");
-            }
-        } catch (ValidationException e) {
-            log.warn("Валидация не пройдена. {}", e.getMessage());
-            throw new ValidationException(e.getMessage());
-        }
+    @DeleteMapping("/{id}/friends/{friendId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteFriend(@PathVariable("id") Long userId, @PathVariable("friendId") Long friendId) {
+        log.info("Получен запрос за удаление из друзей {} пользователя {}", userId, friendId);
+        userService.deleteFriend(userId, friendId);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public Collection<User> findCommonFriends(@PathVariable("id") Long userId, @PathVariable("otherId") Long friendId) {
+        log.info("Получен запрос за нахождение общих друзей у {} и {}", userId, friendId);
+        return userService.findCommonFriends(userId, friendId);
     }
 }
