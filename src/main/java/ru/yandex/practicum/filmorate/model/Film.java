@@ -12,6 +12,8 @@ public class Film {
     private Long id;
     private String name;
     private String description;
+    private String genre;
+    private String rating;
     private LocalDate releaseDate;
     private Integer duration;
     private Set<Long> likesByUsers;
