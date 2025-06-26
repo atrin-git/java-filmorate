@@ -92,7 +92,7 @@ public class UserService {
             throw new DuplicateException("Нельзя добавить пользователя самого себе в друзья");
         }
 
-        if (user.getFriends().contains(friendId)) {//  || friend.getFriendRequests().contains(userId)) {
+        if (user.getFriends().contains(friendId)) {
             log.warn("Попытка добавить друга снова в друзья: userId={}, friendId={}", userId, friendId);
             throw new DuplicateException("Запрос на добавление в друзья ранее уже отправлялся");
         }
