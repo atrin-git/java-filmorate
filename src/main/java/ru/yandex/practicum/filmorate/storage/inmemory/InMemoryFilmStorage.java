@@ -89,7 +89,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film find(Long id) {
+    public Optional<Film> find(Long id) {
         if (id == null || id <= 0) {
             log.warn("Передано значение id = {}", id);
             throw new ValidationException("Идентификатор фильма должен быть определён и положительным");
@@ -99,6 +99,6 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new NotFoundException("Фильм с id = " + id + " не найден");
         }
 
-        return films.get(id);
+        return Optional.of(films.get(id));
     }
 }

@@ -1,20 +1,16 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.dto;
 
 import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.Set;
 
 @Data
 @Builder(toBuilder = true)
-public class User {
-    private Long id;
-    private String email;
-    private String login;
+public class NewUserRequest extends BaseUserRequest {
     private String name;
+    private String login;
+    private String email;
     private String password;
     private LocalDate birthday;
-
-    private Set<Long> friends;
 }

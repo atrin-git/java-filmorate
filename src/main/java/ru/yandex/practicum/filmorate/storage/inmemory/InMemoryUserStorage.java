@@ -13,7 +13,7 @@ import java.util.*;
 import static ru.yandex.practicum.filmorate.utils.Utils.getNextId;
 
 @Slf4j
-@Component
+@Component("in_memory")
 public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users = new HashMap<>();
     private final Set<String> userEmails = new HashSet<>();
@@ -84,7 +84,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User find(Long id) {
+    public Optional<User> find(Long id) {
         if (id == null || id <= 0) {
             log.warn("Передано значение id = {}", id);
             throw new ValidationException("Идентификатор пользователя должен быть определён и положительным");
@@ -94,7 +94,7 @@ public class InMemoryUserStorage implements UserStorage {
             throw new NotFoundException("Пользователь с id = " + id + " не найден");
         }
 
-        return users.get(id);
+        return Optional.of(users.get(id));
     }
 
 }
