@@ -61,11 +61,9 @@ public class BaseDbStorage<T> {
 
         Long id = keyHolder.getKeyAs(Long.class);
 
-        // Возвращаем id нового пользователя
-        if (id != null) {
-            return id;
-        } else {
+        if (id == null) {
             throw new InternalServerException("Не удалось сохранить данные");
         }
+        return id;
     }
 }

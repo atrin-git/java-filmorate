@@ -14,7 +14,6 @@ import ru.yandex.practicum.filmorate.storage.LikesStorage;
 import ru.yandex.practicum.filmorate.storage.RatesStorage;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -60,7 +59,6 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
 
         if (film.getGenres() != null) {
             genresStorage.setGenresForFilm(id, film.getGenres());
-            film.setGenres(new HashSet<>(genresStorage.getGenresForFilm(id)));
         }
 
         ratesStorage.getFilmRating(id).ifPresent(film::setRating);
@@ -125,10 +123,6 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         Collection<Film> films = findMany(
                 FIND_ALL_FILMS_QUERY
         );
-
-        if (films.isEmpty()) {
-            return films;
-        }
 
         films.forEach(film -> {
             film.setGenres(
