@@ -26,7 +26,7 @@ public class RatesController {
     }
 
     @GetMapping("/{id}")
-    public Rates find(@PathVariable("id") Long id) {
+    public Rates find(@PathVariable Long id) {
         log.info("Получен запрос за получение данных о рейтинге {}", id);
         return ratesService.find(id);
     }
