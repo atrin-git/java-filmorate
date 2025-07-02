@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.dto.FilmDto;
+import ru.yandex.practicum.filmorate.dto.NewFilmRequest;
+import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.Collection;
@@ -19,20 +21,27 @@ public class FilmController {
     private final FilmService filmService;
 
     @GetMapping
-    public Collection<Film> findAll() {
+    public Collection<FilmDto> findAll() {
+        log.info("Получен запрос на получение данных о всех фильмах");
         return filmService.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public FilmDto find(@PathVariable("id") Long filmId) {
+        log.info("Получен запрос на получение данных о фильме {}", filmId);
+        return filmService.find(filmId);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Film create(@RequestBody Film film) {
+    public FilmDto create(@RequestBody NewFilmRequest film) {
         log.info("Получен запрос на добавление фильма");
         clearStringData(film);
         return filmService.create(film);
     }
 
     @PutMapping
-    public Film update(@RequestBody Film film) {
+    public FilmDto update(@RequestBody UpdateFilmRequest film) {
         log.info("Получен запрос на обновление фильма с id = {}", film.getId());
         clearStringData(film);
         return filmService.update(film);
@@ -53,7 +62,7 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public Collection<Film> getPopularFilms(@RequestParam(name = "count", defaultValue = "10") int count) {
+    public Collection<FilmDto> getPopularFilms(@RequestParam(name = "count", defaultValue = "10") int count) {
         log.info("Получен запрос на список популярных фильмов в количестве {} шт.", count);
         return filmService.getPopularFilms(count);
     }

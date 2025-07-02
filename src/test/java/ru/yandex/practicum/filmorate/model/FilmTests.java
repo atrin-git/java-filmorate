@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -17,6 +18,9 @@ public class FilmTests {
                 .description("description")
                 .releaseDate(LocalDate.of(1990, 1, 1))
                 .duration(200)
+                .rating(Rates.builder().id(1L).build())
+                .genres(Set.of(Genre.builder().id(1L).build()))
+                .likesByUsers(Set.of(1L, 2L))
                 .build();
 
         assertNotNull(film);
