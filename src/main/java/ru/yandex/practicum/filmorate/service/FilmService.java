@@ -138,8 +138,7 @@ public class FilmService {
 
     public Collection<FilmDto> getPopularFilms(Long count, Long genreId, Long year) {
         Collection<Film> films = filmStorage.getAll();
-        Collection<FilmDto> result = new ArrayList<>();
-        result = films.stream()
+        return films.stream()
                 .filter(film -> {
                     if (genreId == null) {
                         return true;
@@ -158,7 +157,6 @@ public class FilmService {
                 .limit(count)
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
-        return result;
     }
 
 
