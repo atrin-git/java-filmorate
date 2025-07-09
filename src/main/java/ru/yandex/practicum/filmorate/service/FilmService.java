@@ -98,6 +98,16 @@ public class FilmService {
         return FilmMapper.mapToFilmDto(filmStorage.update(film));
     }
 
+    public void delete(Long filmId) {
+        filmStorage.find(filmId)
+                        .orElseThrow(() -> {
+                            log.warn("Не найден фильм с ID = {}", filmId);
+                            return new NotFoundException("Фильм не найден с ID: "  + filmId);
+                        });
+
+        filmStorage.delete(filmId);
+    }
+
     public void addLike(Long filmId, Long userId) {
         final Film film = filmStorage.find(filmId)
                 .orElseThrow(() -> {
