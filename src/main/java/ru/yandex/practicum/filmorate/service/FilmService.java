@@ -158,6 +158,4 @@ public class FilmService {
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
     }
-
-
 }
