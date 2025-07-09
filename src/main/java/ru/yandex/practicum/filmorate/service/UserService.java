@@ -78,6 +78,16 @@ public class UserService {
         return UserMapper.mapToUserDto(userStorage.update(user));
     }
 
+    public void delete(Long userId) {
+        userStorage.find(userId)
+                .orElseThrow(() -> {
+                    log.warn("Не найден пользователь с ID = {}", userId);
+                    return new NotFoundException("Пользователь не найден с ID: " + userId);
+                });
+
+        userStorage.delete(userId);
+    }
+
     public Collection<UserDto> getFriends(Long userId) {
         final User user = userStorage.find(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + userId));
