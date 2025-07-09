@@ -13,8 +13,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.validation.FilmValidator;
 import ru.yandex.practicum.filmorate.storage.*;
-
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
