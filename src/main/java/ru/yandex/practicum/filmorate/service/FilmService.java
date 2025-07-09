@@ -144,4 +144,12 @@ public class FilmService {
                 .toList();
     }
 
+    public Collection<FilmDto> getCommonFilms(Long userId, Long friendId) {
+        Collection<Film> films = filmStorage.getCommonFilms(userId, friendId);
+        return films.stream()
+                .sorted((f1, f2) -> f2.getLikesByUsers().size() - f1.getLikesByUsers().size())
+                .map(FilmMapper::mapToFilmDto)
+                .toList();
+    }
+
 }

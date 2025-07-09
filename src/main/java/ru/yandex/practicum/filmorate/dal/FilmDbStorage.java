@@ -40,6 +40,12 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     private static final String DELETE_QUERY = "DELETE FROM films WHERE id = ?";
     private static final String DELETE_ALL_QUERY = "DELETE FROM films";
 
+    public static final String FIND_IDS_OF_COMMON_FILMS = "SELECT DISTINCT film_id " +
+            "FROM likes_on_films " +
+            "WHERE user_id= ? OR user_id= ?" +
+            "GROUP BY film_id " +
+            "HAVING COUNT(DISTINCT user_id) = 2;";
+
     public FilmDbStorage(JdbcTemplate jdbc, RowMapper<Film> mapper) {
         super(jdbc, mapper);
     }
@@ -129,6 +135,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                     genresStorage.getGenresForFilm(film.getId()).stream()
                             .collect(Collectors.toSet())
             );
+
             film.setLikesByUsers(
                     likeStorage.getLikesOnFilm(film.getId()).stream()
                             .map(Likes::getUserId)
@@ -138,5 +145,14 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         });
 
         return films;
+    }
+
+    public Collection<Film> getCommonFilms(Long userId, Long friendId) {
+        Collection<Long> ids = jdbc.queryForList(FIND_IDS_OF_COMMON_FILMS, Long.class, userId, friendId);
+        return ids.stream()
+                .map(this::find)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
     }
 }
