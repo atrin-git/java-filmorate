@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -103,5 +105,22 @@ class FilmServiceTest {
         Collection<FilmDto> result = filmService.getPopularFilms(2L, null, null);
 
         assertEquals(2, result.size());
+    }
+
+    @Test
+    void testDeleteFilm_ById() {
+        when(filmStorage.find(1L)).thenReturn(Optional.of(film1));
+        doNothing().when(filmStorage).delete(1L);
+        filmService.delete(1L);
+
+        verify(filmStorage).delete(1L);
+    }
+
+    @Test
+    void testDeleteFilm_ById_ShouldThrownNotFoundException() {
+        when(filmStorage.find(1L)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> filmService.delete(1L));
+        verify(filmStorage, never()).delete(1L);
     }
 }
