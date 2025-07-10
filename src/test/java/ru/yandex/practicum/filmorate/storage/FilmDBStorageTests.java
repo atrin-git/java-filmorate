@@ -7,10 +7,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
 import ru.yandex.practicum.filmorate.dal.*;
-import ru.yandex.practicum.filmorate.dal.mappers.FilmRowMapper;
-import ru.yandex.practicum.filmorate.dal.mappers.GenresRowMapper;
-import ru.yandex.practicum.filmorate.dal.mappers.LikesRowMapper;
-import ru.yandex.practicum.filmorate.dal.mappers.RatesRowMapper;
+import ru.yandex.practicum.filmorate.dal.mappers.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.utils.GenerateTestData;
@@ -22,7 +19,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Import({FilmDbStorage.class, GenresDbStorage.class, LikesDbStorage.class, RatesDbStorage.class,
-        FilmRowMapper.class, GenresRowMapper.class, LikesRowMapper.class, RatesRowMapper.class})
+        FilmRowMapper.class, GenresRowMapper.class, LikesRowMapper.class, RatesRowMapper.class,
+        UserDbStorage.class, UserRowMapper.class})
 class FilmDBStorageTests {
     private final FilmDbStorage filmStorage;
     private final UserDbStorage userStorage;
