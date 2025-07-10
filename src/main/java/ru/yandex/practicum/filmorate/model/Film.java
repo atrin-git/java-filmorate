@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.Set;
 
 @Data
@@ -12,10 +13,10 @@ public class Film {
     private Long id;
     private String name;
     private String description;
-    private Rates rating;
+    private Rates mpa;
     private LocalDate releaseDate;
     private Integer duration;
-
     private Set<Long> likesByUsers;
-    private Set<Genre> genres;
+    private Collection<Genre> genres;
+    private Collection<Director> directors;
 }
