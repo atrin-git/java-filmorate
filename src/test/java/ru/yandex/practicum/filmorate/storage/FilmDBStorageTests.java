@@ -16,11 +16,7 @@ import ru.yandex.practicum.filmorate.dal.mappers.LikesRowMapper;
 import ru.yandex.practicum.filmorate.dal.mappers.RatesRowMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.utils.GenerateTestData;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-
+import java.util.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -48,7 +44,6 @@ class FilmDBStorageTests {
     public void checkDeleteFilm() {
         Film createdFilm = filmStorage.create(GenerateTestData.generateNewFilm(List.of(1L)));
         filmStorage.delete(createdFilm.getId());
-
         Optional<Film> deletedFilm = filmStorage.find(createdFilm.getId());
 
         assertEquals(Optional.empty(), deletedFilm, "Удалённый фильм не должен был быть найден");
@@ -59,7 +54,6 @@ class FilmDBStorageTests {
         Film createdFilm1 = filmStorage.create(GenerateTestData.generateNewFilm(List.of(1L)));
         Film createdFilm2 = filmStorage.create(GenerateTestData.generateNewFilm(List.of(2L)));
         filmStorage.deleteAll();
-
         Collection<Film> films = filmStorage.getAll();
 
         assertEquals(0, films.size(), "Должны были быть удалены все фильмы");
@@ -70,7 +64,6 @@ class FilmDBStorageTests {
         filmStorage.create(GenerateTestData.generateNewFilm(List.of(1L)));
         filmStorage.create(GenerateTestData.generateNewFilm(List.of(2L)));
         filmStorage.create(GenerateTestData.generateNewFilm(List.of(3L)));
-
         Collection<Film> films = filmStorage.getAll();
 
         assertEquals(3, films.size(), "Вернулись не все фильмы");
@@ -83,11 +76,10 @@ class FilmDBStorageTests {
         Film updateFilm = GenerateTestData.generateNewFilm(List.of(2L));
         updateFilm.setId(filmCreated.getId());
         filmStorage.update(updateFilm);
-
         Optional<Film> actualFilm = filmStorage.find(filmCreated.getId());
+
         assertThat(actualFilm)
                 .isPresent()
                 .hasValueSatisfying(value -> assertEquals(updateFilm, value));
     }
-
 }
