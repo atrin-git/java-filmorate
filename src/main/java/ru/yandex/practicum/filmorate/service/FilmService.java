@@ -13,9 +13,10 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.validation.FilmValidator;
 import ru.yandex.practicum.filmorate.storage.*;
-
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -135,13 +136,20 @@ public class FilmService {
         likeStorage.removeLikeOnFilm(filmId, userId);
     }
 
-    public Collection<FilmDto> getPopularFilms(int count) {
+    public Collection<FilmDto> getPopularFilms(Long count, Long genreId, Long year) {
         Collection<Film> films = filmStorage.getAll();
-        return films.stream()
-                .sorted((f1, f2) -> f2.getLikesByUsers().size() - f1.getLikesByUsers().size())
+        Stream<Film> filmStream = films.stream();
+        if (genreId != null) {
+            filmStream = filmStream.filter(film -> film.getGenres().stream()
+                    .anyMatch(genre -> Objects.equals(genre.getId(), genreId)));
+        }
+        if (year != null) {
+            filmStream = filmStream.filter(film -> film.getReleaseDate().getYear() == year);
+        }
+        return filmStream.sorted((film1, film2) -> Integer.compare(film2.getLikesByUsers()
+                .size(), film1.getLikesByUsers().size()))
                 .limit(count)
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
     }
-
 }
