@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.storage.LikesStorage;
 import ru.yandex.practicum.filmorate.storage.RatesStorage;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -39,12 +40,14 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
             "name = ?, description = ?, release_date = ?, duration = ?, rating_id = ? WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM films WHERE id = ?";
     private static final String DELETE_ALL_QUERY = "DELETE FROM films";
-
-    public static final String FIND_IDS_OF_COMMON_FILMS = "SELECT DISTINCT film_id " +
-            "FROM likes_on_films " +
-            "WHERE user_id= ? OR user_id= ?" +
-            "GROUP BY film_id " +
-            "HAVING COUNT(DISTINCT user_id) = 2;";
+    public static final String GET_COMMON_FILMS_QUERY = """
+            SELECT *
+            FROM films
+            WHERE id IN (SELECT DISTINCT film_id
+                         FROM likes_on_films
+                         WHERE user_id=? OR user_id=?
+                         GROUP BY film_id
+                         HAVING COUNT(DISTINCT user_id) = 2)""";
 
     public FilmDbStorage(JdbcTemplate jdbc, RowMapper<Film> mapper) {
         super(jdbc, mapper);
@@ -108,18 +111,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                 id
         );
 
-        film.ifPresent(value -> {
-            value.setGenres(
-                    genresStorage.getGenresForFilm(value.getId()).stream()
-                            .collect(Collectors.toSet())
-            );
-            value.setLikesByUsers(
-                    likeStorage.getLikesOnFilm(value.getId()).stream()
-                            .map(Likes::getUserId)
-                            .collect(Collectors.toSet())
-            );
-            ratesStorage.getFilmRating(value.getId()).ifPresent(value::setRating);
-        });
+        film.ifPresent(this::addGenresAndLikes);
 
         return film;
     }
@@ -130,29 +122,28 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                 FIND_ALL_FILMS_QUERY
         );
 
-        films.forEach(film -> {
-            film.setGenres(
-                    genresStorage.getGenresForFilm(film.getId()).stream()
-                            .collect(Collectors.toSet())
-            );
-
-            film.setLikesByUsers(
-                    likeStorage.getLikesOnFilm(film.getId()).stream()
-                            .map(Likes::getUserId)
-                            .collect(Collectors.toSet())
-            );
-            ratesStorage.getFilmRating(film.getId()).ifPresent(film::setRating);
-        });
+        films.forEach(this::addGenresAndLikes);
 
         return films;
     }
 
     public Collection<Film> getCommonFilms(Long userId, Long friendId) {
-        Collection<Long> ids = jdbc.queryForList(FIND_IDS_OF_COMMON_FILMS, Long.class, userId, friendId);
-        return ids.stream()
-                .map(this::find)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .toList();
+        Collection<Film> films = findMany(GET_COMMON_FILMS_QUERY, userId, friendId);
+
+        films.forEach(this::addGenresAndLikes);
+
+        return films;
+    }
+
+    private void addGenresAndLikes(Film film) {
+        film.setGenres(
+                new HashSet<>(genresStorage.getGenresForFilm(film.getId()))
+        );
+        film.setLikesByUsers(
+                likeStorage.getLikesOnFilm(film.getId()).stream()
+                        .map(Likes::getUserId)
+                        .collect(Collectors.toSet())
+        );
+        ratesStorage.getFilmRating(film.getId()).ifPresent(film::setRating);
     }
 }
