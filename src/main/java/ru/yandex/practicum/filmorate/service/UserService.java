@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.dto.UserDto;
 import ru.yandex.practicum.filmorate.dto.mappers.UserMapper;
 import ru.yandex.practicum.filmorate.exception.DuplicateException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.validation.UserValidator;
 import ru.yandex.practicum.filmorate.storage.FriendsStorage;
@@ -38,10 +39,12 @@ public class UserService {
                 .toList();
     }
 
-    public UserDto find(Long id) {
-        return userStorage.find(id)
+    public UserDto find(Long userId) {
+        if (userId == null || userId < 1)
+            throw new ValidationException("Указан некорректный id пользователя");
+        return userStorage.find(userId)
                 .map(UserMapper::mapToUserDto)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + id));
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + userId));
     }
 
     public UserDto create(NewUserRequest newUser) {
@@ -68,6 +71,18 @@ public class UserService {
         user = UserMapper.updateUserFields(oldUser, updateUser);
 
         return UserMapper.mapToUserDto(userStorage.update(user));
+    }
+
+    public void delete(Long userId) {
+        if (userId == null || userId < 1)
+            throw new ValidationException("Указан некорректный id пользователя");
+        userStorage.find(userId)
+                .orElseThrow(() -> {
+                    log.warn("Не найден пользователь с ID = {}", userId);
+                    return new NotFoundException("Пользователь не найден с ID: " + userId);
+                });
+
+        userStorage.delete(userId);
     }
 
     public Collection<UserDto> getFriends(Long userId) {

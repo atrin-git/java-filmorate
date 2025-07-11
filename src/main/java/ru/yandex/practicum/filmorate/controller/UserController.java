@@ -27,6 +27,12 @@ public class UserController {
         return userService.findAll();
     }
 
+    @GetMapping("/{userId}")
+    public UserDto findById(@PathVariable Long userId) {
+        log.info("Получен запрос на получения пользователя с id: {}", userId);
+        return userService.find(userId);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto create(@RequestBody NewUserRequest user) {
@@ -40,6 +46,13 @@ public class UserController {
         log.info("Получен запрос на обновление пользователя с id = {}", user.getId());
         clearStringData(user);
         return userService.update(user);
+    }
+
+    @DeleteMapping("/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long userId) {
+        log.info("Получен запрос на удаление пользователя с id = {}", userId);
+        userService.delete(userId);
     }
 
     @GetMapping("/{id}/friends")
