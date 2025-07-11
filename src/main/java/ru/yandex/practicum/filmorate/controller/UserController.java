@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.UserDto;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
@@ -53,8 +52,6 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long userId) {
         log.info("Получен запрос на удаление пользователя с id = {}", userId);
-        if (userId == null || userId < 1)
-            throw new ValidationException("Указан некорректный id пользователя");
         userService.delete(userId);
     }
 
