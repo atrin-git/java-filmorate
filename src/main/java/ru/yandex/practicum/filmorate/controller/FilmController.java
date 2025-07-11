@@ -68,4 +68,11 @@ public class FilmController {
         log.info("Получен запрос на список популярных фильмов в количестве {} шт.", count);
         return filmService.getPopularFilms(count, genreId, year);
     }
+
+    @GetMapping("/common")
+    public Collection<FilmDto> getCommonFilms(@RequestParam(value = "userId") Long userId,
+                                              @RequestParam(value = "friendId") Long friendId) {
+        log.info("Получен запрос на список общих фильмов двух пользователей {} и {} ", userId, friendId);
+        return filmService.getCommonFilms(userId, friendId);
+    }
 }

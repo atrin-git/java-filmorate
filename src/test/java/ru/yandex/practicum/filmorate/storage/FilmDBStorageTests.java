@@ -6,15 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
-import ru.yandex.practicum.filmorate.dal.FilmDbStorage;
-import ru.yandex.practicum.filmorate.dal.GenresDbStorage;
-import ru.yandex.practicum.filmorate.dal.LikesDbStorage;
-import ru.yandex.practicum.filmorate.dal.RatesDbStorage;
-import ru.yandex.practicum.filmorate.dal.mappers.FilmRowMapper;
-import ru.yandex.practicum.filmorate.dal.mappers.GenresRowMapper;
-import ru.yandex.practicum.filmorate.dal.mappers.LikesRowMapper;
-import ru.yandex.practicum.filmorate.dal.mappers.RatesRowMapper;
+import ru.yandex.practicum.filmorate.dal.*;
+import ru.yandex.practicum.filmorate.dal.mappers.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.utils.GenerateTestData;
 import java.util.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -24,9 +19,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Import({FilmDbStorage.class, GenresDbStorage.class, LikesDbStorage.class, RatesDbStorage.class,
-        FilmRowMapper.class, GenresRowMapper.class, LikesRowMapper.class, RatesRowMapper.class})
+        FilmRowMapper.class, GenresRowMapper.class, LikesRowMapper.class, RatesRowMapper.class,
+        UserDbStorage.class, UserRowMapper.class})
 class FilmDBStorageTests {
     private final FilmDbStorage filmStorage;
+    private final UserDbStorage userStorage;
+    private final LikesDbStorage likesStorage;
 
     @Test
     public void checkCreateAndFindFilmById() {
@@ -81,5 +79,19 @@ class FilmDBStorageTests {
         assertThat(actualFilm)
                 .isPresent()
                 .hasValueSatisfying(value -> assertEquals(updateFilm, value));
+    }
+
+    @Test
+    public void checkFindCommonFilms() {
+        Film film = filmStorage.create(GenerateTestData.generateNewFilm(List.of(1L)));
+        User user1 = userStorage.create(GenerateTestData.generateNewUser(List.of(1L)));
+        User user2 = userStorage.create(GenerateTestData.generateNewUser(List.of(2L)));
+
+        likesStorage.addLikeOnFilm(film.getId(), user1.getId());
+        likesStorage.addLikeOnFilm(film.getId(), user2.getId());
+
+        Collection<Film> films = filmStorage.getCommonFilms(user1.getId(), user2.getId());
+
+        assertEquals(1, films.size(), "Общие фильмы не вернулись");
     }
 }
