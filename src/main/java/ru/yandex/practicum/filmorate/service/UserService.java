@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.dto.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.dto.mappers.UserMapper;
 import ru.yandex.practicum.filmorate.exception.DuplicateException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.validation.UserValidator;
@@ -48,7 +49,7 @@ public class UserService {
     public UserDto find(Long id) {
         return userStorage.find(id)
                 .map(UserMapper::mapToUserDto)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + id));
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + userId));
     }
 
     public UserDto create(NewUserRequest newUser) {
@@ -121,6 +122,7 @@ public class UserService {
     public void deleteFriend(Long userId, Long friendId) {
         final User user = userStorage.find(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + userId));
+
 
         final User friend = userStorage.find(friendId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + friendId));

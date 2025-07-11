@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.NewFilmRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.Collection;
@@ -52,8 +51,6 @@ public class FilmController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long filmId) {
         log.info("Получен запрос на удаление фильма с id = {}", filmId);
-        if (filmId == null || filmId < 1)
-            throw new ValidationException("Указан некорректный id фильма");
         filmService.delete(filmId);
     }
 

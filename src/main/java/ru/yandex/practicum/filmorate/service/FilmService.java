@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.dto.NewFilmRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.dto.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.validation.FilmValidator;
@@ -47,6 +48,8 @@ public class FilmService {
     }
 
     public FilmDto find(Long filmId) {
+        if (filmId == null || filmId < 1)
+            throw new ValidationException("Указан некорректный id пользователя");
         return filmStorage.find(filmId)
                 .map(FilmMapper::mapToFilmDto)
                 .orElseThrow(() -> {
@@ -100,6 +103,8 @@ public class FilmService {
     }
 
     public void delete(Long filmId) {
+        if (filmId == null || filmId < 1)
+            throw new ValidationException("Указан некорректный id пользователя");
         filmStorage.find(filmId)
                         .orElseThrow(() -> {
                             log.warn("Не найден фильм с ID = {}", filmId);
