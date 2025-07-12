@@ -135,6 +135,28 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         return films;
     }
 
+    @Override
+    public Collection<Film> getRecommendations(Long userId) {
+        String GET_RECOMMENDED_FILMS = """
+                SELECT *
+                FROM films
+                WHERE id IN (SELECT film_id
+                             FROM likes_on_films
+                             WHERE user_id IN (SELECT user_id
+                                              FROM (SELECT l2.user_id, COUNT(*) AS common_films
+                                                    FROM likes_on_films l1 JOIN likes_on_films l2 ON l1.film_id = l2.film_id
+                                                    WHERE l1.user_id = ? AND l2.user_id != ?
+                                                    GROUP BY l2.user_id
+                                                    ORDER BY common_films DESC
+                                                    LIMIT 1))
+                             EXCEPT
+                             SELECT film_id
+                             FROM likes_on_films
+                             WHERE user_id = ?)""";
+
+        return findMany(GET_RECOMMENDED_FILMS, userId, userId, userId);
+    }
+
     private void addGenresAndLikes(Film film) {
         film.setGenres(
                 new HashSet<>(genresStorage.getGenresForFilm(film.getId()))

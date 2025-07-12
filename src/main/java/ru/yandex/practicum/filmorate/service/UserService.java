@@ -4,12 +4,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dal.FilmDbStorage;
+import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.UserDto;
+import ru.yandex.practicum.filmorate.dto.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.dto.mappers.UserMapper;
 import ru.yandex.practicum.filmorate.exception.DuplicateException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.validation.UserValidator;
 import ru.yandex.practicum.filmorate.storage.FriendsStorage;
@@ -30,6 +34,9 @@ public class UserService {
     @Qualifier("db-friends")
     private FriendsStorage friendStorage;
     @Autowired
+    @Qualifier("db-films")
+    private FilmDbStorage filmDbStorage;
+    @Autowired
     private UserValidator userValidator;
 
     public Collection<UserDto> findAll() {
@@ -45,6 +52,7 @@ public class UserService {
     }
 
     public UserDto create(NewUserRequest newUser) {
+
         User user = UserMapper.mapToUser(newUser);
         userValidator.checkUserIsValid(user);
         Collection<User> users = userStorage.getAll();
@@ -137,4 +145,10 @@ public class UserService {
                 .toList();
     }
 
+    public Collection<FilmDto> getRecommendations(Long userId) {
+        Collection<Film> films = filmDbStorage.getRecommendations(userId);
+        return films.stream()
+                .map(FilmMapper::mapToFilmDto)
+                .toList();
+    }
 }
