@@ -32,31 +32,31 @@ public class DirectorController {
     @ResponseStatus(HttpStatus.CREATED)
     public DirectorDto create(@RequestBody NewDirectorRequest director) {
         log.info("Получен запрос на добавление режиссера");
-        return this.directorService.create(director);
+        return directorService.create(director);
     }
 
     @PutMapping
     public DirectorDto update(@RequestBody UpdateDirectorRequest director) {
         log.info("Получен запрос на обновление режиссера с именем = {}", director.getName());
-        return this.directorService.update(director);
+        return directorService.update(director);
     }
 
     @GetMapping
     public Collection<Director> findAll() {
         log.info("Получен запрос на получение всех режиссеров");
-        return this.directorService.findAll();
+        return directorService.findAll();
     }
 
     @GetMapping({"/{id}"})
     public Director find(@PathVariable Long id) {
         log.info("Получен запрос на получение режиссера {}", id);
-        return this.directorService.find(id);
+        return directorService.find(id);
     }
 
     @DeleteMapping({"/{id}"})
     public ResponseEntity<?> delete(@PathVariable Long id) {
         log.info("Получен запрос за удаление режиссера {}", id);
-        this.directorService.delete(id);
+        directorService.delete(id);
         return ResponseEntity.ok().build();
     }
 }

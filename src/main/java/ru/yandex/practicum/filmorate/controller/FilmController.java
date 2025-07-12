@@ -8,9 +8,7 @@ import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.NewFilmRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.service.FilmService;
-
 import java.util.Collection;
-
 import static ru.yandex.practicum.filmorate.utils.Utils.clearStringData;
 
 @Slf4j
@@ -81,5 +79,12 @@ public class FilmController {
                                               @RequestParam(value = "friendId") Long friendId) {
         log.info("Получен запрос на список общих фильмов двух пользователей {} и {} ", userId, friendId);
         return filmService.getCommonFilms(userId, friendId);
+    }
+    @GetMapping("/director/{directorId}")
+    public Collection<FilmDto> getFilmsByDirector(
+            @PathVariable Long directorId,
+            @RequestParam(required = false) String sortBy
+    ) {
+        return filmService.getFilmsByDirector(directorId, sortBy);
     }
 }

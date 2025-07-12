@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dal.DirectorsFilmsDbStorage;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.NewFilmRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
@@ -37,6 +38,9 @@ public class FilmService {
     @Autowired
     @Qualifier("db-rates")
     private RatesStorage ratesStorage;
+    @Autowired
+    @Qualifier("db-directorsFilms")
+    private DirectorsFilmsDbStorage directorsFilmsDbStorage;
     @Autowired
     private FilmValidator filmValidator;
 
@@ -97,7 +101,6 @@ public class FilmService {
                 });
 
         film = FilmMapper.updateFilmFields(oldFilm, updateFilm);
-
         return FilmMapper.mapToFilmDto(filmStorage.update(film));
     }
 
@@ -176,4 +179,16 @@ public class FilmService {
                 .toList();
     }
 
+    public Collection<FilmDto> getFilmsByDirector(Long directorId, String sortBy) {
+        Collection<FilmDto> REST = directorsFilmsDbStorage.getDirectorOnFilm(directorId)
+                .stream()
+                .peek(filmStorage::addGenresAndLikes)
+                .map(FilmMapper::mapToFilmDto)
+                .toList();
+        if ("year".equals(sortBy)) {
+            return REST;
+        }
+        return REST.stream().sorted((f1, f2) -> f2.getLikesByUsers().size() - f1.getLikesByUsers().size())
+                .toList();
+    }
 }

@@ -2,34 +2,55 @@ package ru.yandex.practicum.filmorate.dal;
 
 import java.util.Collection;
 import java.util.Set;
-import lombok.Generated;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.DirectorsFilmsStorage;
 
 @Component("db-directorsFilms")
-public class DirectorsFilmsDbStorage extends BaseDbStorage<Director> implements DirectorsFilmsStorage {
-    @Generated
-    private static final Logger log = LoggerFactory.getLogger(DirectorsFilmsDbStorage.class);
-    private static final String INSERT_GENRES_QUERY = "INSERT INTO directors_on_films (director_id, film_id) VALUES (?, ?)";
-    private static final String FIND_FILM_GENRES_QUERY = "SELECT * FROM directors g WHERE id IN (SELECT director_id FROM directors_on_films gof WHERE gof.film_id = ?)";
+public class DirectorsFilmsDbStorage implements DirectorsFilmsStorage {
+    private final RowMapper<Film> filmRowMapper;
+    private final RowMapper<Director> directorRowMapper;
+    private final JdbcTemplate jdbc;
+    private static final String INSERT_DIRECTORS_FILMS_QUERY = "INSERT INTO directors_on_films (director_id, film_id) VALUES (?, ?)";
+    private static final String FIND_FILMS_DIRECTORS_QUERY = """
+    SELECT films.*
+    FROM Films
+    JOIN directors_on_films ON Films.id = directors_on_films.film_id
+    WHERE directors_on_films.director_id = ?
+    ORDER BY Films.release_date
+    """;
+    private static final String FIND_DIRECTOR_FILM_QUERY = """
+    SELECT directors.*
+    FROM directors
+    JOIN directors_on_films ON directors.id = directors_on_films.director_id
+    WHERE directors_on_films.film_id = ?
+    """;
 
-    public DirectorsFilmsDbStorage(JdbcTemplate jdbc, RowMapper<Director> mapper) {
-        super(jdbc, mapper);
+    public DirectorsFilmsDbStorage(JdbcTemplate jdbc, RowMapper<Director> directorRowMapper, RowMapper<Film> filmRowMapper) {
+        this.filmRowMapper = filmRowMapper;
+        this.directorRowMapper = directorRowMapper;
+        this.jdbc = jdbc;
     }
 
+    //добавить режиссеров в фильм
     public void setDirectorsForFilm(long id, Set<Director> directors) {
         directors.forEach((dir) -> {
-            this.update("INSERT INTO directors_on_films (director_id, film_id) VALUES (?, ?)", new Object[]{dir.getId(), id});
+            jdbc.update(INSERT_DIRECTORS_FILMS_QUERY, dir.getId(), id);
         });
     }
 
-    public Collection<Director> getDirectorOnFilm(Long id) {
-        return this.findMany("SELECT * FROM directors g WHERE id IN (SELECT director_id FROM directors_on_films gof WHERE gof.film_id = ?)", new Object[]{id});
+    //возврат фильмов режиссера
+    public Collection<Film> getDirectorOnFilm(Long id) {
+        return jdbc.query(FIND_FILMS_DIRECTORS_QUERY, filmRowMapper, id);
+    }
+
+    //возврат режиссеров фильма
+    @Override
+    public Collection<Director> getDirectorsForFilm(Long id) {
+        return jdbc.query(FIND_DIRECTOR_FILM_QUERY, directorRowMapper, id);
     }
 }
 

@@ -19,9 +19,10 @@ public class FilmDto {
     private String name;
     private String description;
     private Rates mpa;
+    private Collection<Genre> genres;
     private LocalDate releaseDate;
     private Integer duration;
+
     private Set<Long> likesByUsers;
-    private Collection<Genre> genres;
     private Collection<Director> directors;
 }

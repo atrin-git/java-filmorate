@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.NewFilmRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
@@ -16,18 +17,15 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FilmMapper {
     public static Film mapToFilm(NewFilmRequest request) {
-//        Set<Integer> genres = new HashSet<>();
-//        request.getGenres().forEach(genre -> {
-//            genres.add((int) ((LinkedHashMap) genre).get("id"));
-//        });
 
         return Film.builder()
                 .name(request.getName())
                 .description(request.getDescription())
                 .releaseDate(request.getReleaseDate())
                 .duration(request.getDuration())
-                .mpa(request.getMpa())
+                .rating(request.getMpa())
                 .genres(request.getGenres())
+                .directors(request.getDirectors())
                 .build();
     }
 
@@ -38,8 +36,9 @@ public final class FilmMapper {
                 .description(request.getDescription())
                 .releaseDate(request.getReleaseDate())
                 .duration(request.getDuration())
-                .mpa(request.getMpa())
+                .rating(request.getMpa())
                 .genres(request.getGenres())
+                .directors(request.getDirectors())
                 .build();
     }
 
@@ -57,9 +56,10 @@ public final class FilmMapper {
                 .description(film.getDescription())
                 .releaseDate(film.getReleaseDate())
                 .duration(film.getDuration())
-                .mpa(film.getMpa())
+                .mpa(film.getRating())
                 .likesByUsers(film.getLikesByUsers())
                 .genres(genres)
+                .directors(film.getDirectors())
                 .build();
     }
 
@@ -77,10 +77,13 @@ public final class FilmMapper {
             film.setDuration(request.getDuration());
         }
         if (request.hasRates()) {
-            film.setMpa(request.getMpa());
+            film.setRating(request.getMpa());
         }
         if (request.hasGenres()) {
             film.setGenres(request.getGenres());
+        }
+        if (request.hasDirectors()) {
+            film.setDirectors(request.getDirectors());
         }
         return film;
     }

@@ -8,11 +8,12 @@ import ru.yandex.practicum.filmorate.model.Director;
 
 @Component
 public class DirectorsRowMapper implements RowMapper<Director> {
-    public DirectorsRowMapper() {
-    }
-
+    @Override
     public Director mapRow(ResultSet resultSet, int rowNum) throws SQLException {
-        return Director.builder().id(resultSet.getLong("id")).name(resultSet.getString("name")).build();
+        return Director.builder()
+                .id(resultSet.getLong("id"))
+                .name(resultSet.getString("name"))
+                .build();
     }
 }
 

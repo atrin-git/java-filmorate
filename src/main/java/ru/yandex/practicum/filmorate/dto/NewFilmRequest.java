@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.dto;
 
 import lombok.Builder;
 import lombok.Data;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rates;
 
@@ -17,4 +18,5 @@ public class NewFilmRequest extends BaseFilmRequest {
     private Integer duration;
     private Rates mpa;
     private Set<Genre> genres;
+    private Set<Director> directors;
 }

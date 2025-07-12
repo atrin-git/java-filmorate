@@ -1,12 +1,10 @@
 package ru.yandex.practicum.filmorate.utils;
 
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Rates;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.*;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -72,5 +70,11 @@ public class GenerateTestData {
             buffer.append((char) randomLimitedInt);
         }
         return buffer.toString();
+    }
+
+    public static Director generateNewDirector(List<Long> longs, int nameLength) {
+        return Director.builder()
+                .id(getNextId(longs))
+                .name(generateString(nameLength)).build();
     }
 }
