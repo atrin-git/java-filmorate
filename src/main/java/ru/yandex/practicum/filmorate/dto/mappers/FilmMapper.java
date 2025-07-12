@@ -16,10 +16,6 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FilmMapper {
     public static Film mapToFilm(NewFilmRequest request) {
-//        Set<Integer> genres = new HashSet<>();
-//        request.getGenres().forEach(genre -> {
-//            genres.add((int) ((LinkedHashMap) genre).get("id"));
-//        });
 
         return Film.builder()
                 .name(request.getName())
@@ -28,6 +24,7 @@ public final class FilmMapper {
                 .duration(request.getDuration())
                 .rating(request.getMpa())
                 .genres(request.getGenres())
+                .directors(request.getDirectors())
                 .build();
     }
 
@@ -40,6 +37,7 @@ public final class FilmMapper {
                 .duration(request.getDuration())
                 .rating(request.getMpa())
                 .genres(request.getGenres())
+                .directors(request.getDirectors())
                 .build();
     }
 
@@ -60,6 +58,7 @@ public final class FilmMapper {
                 .mpa(film.getRating())
                 .likesByUsers(film.getLikesByUsers())
                 .genres(genres)
+                .directors(film.getDirectors())
                 .build();
     }
 
@@ -81,6 +80,9 @@ public final class FilmMapper {
         }
         if (request.hasGenres()) {
             film.setGenres(request.getGenres());
+        }
+        if (request.hasDirectors()) {
+            film.setDirectors(request.getDirectors());
         }
         return film;
     }

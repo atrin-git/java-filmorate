@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.Builder;
 import lombok.Data;
-
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -18,4 +17,5 @@ public class Film {
 
     private Set<Long> likesByUsers;
     private Set<Genre> genres;
+    private Set<Director> directors;
 }
