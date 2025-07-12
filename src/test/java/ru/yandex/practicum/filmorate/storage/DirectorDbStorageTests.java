@@ -53,7 +53,6 @@ public class DirectorDbStorageTests {
         Director director = directorDbStorage.create(GenerateTestData.generateNewDirector(List.of(1L),10));
         directorDbStorage.delete(director.getId());
         Optional<Director> deletedFilm = directorDbStorage.find(director.getId());
-
         assertEquals(Optional.empty(), deletedFilm, "Удалённый Режиссер не должен был быть найден");
     }
 
