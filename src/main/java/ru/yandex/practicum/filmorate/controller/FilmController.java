@@ -80,6 +80,7 @@ public class FilmController {
         log.info("Получен запрос на список общих фильмов двух пользователей {} и {} ", userId, friendId);
         return filmService.getCommonFilms(userId, friendId);
     }
+    
     @GetMapping("/director/{directorId}")
     public Collection<FilmDto> getFilmsByDirector(
             @PathVariable Long directorId,
