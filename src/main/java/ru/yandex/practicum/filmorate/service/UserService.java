@@ -9,14 +9,18 @@ import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.UserDto;
+import ru.yandex.practicum.filmorate.dto.mappers.AuditMapper;
 import ru.yandex.practicum.filmorate.dto.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.dto.mappers.UserMapper;
 import ru.yandex.practicum.filmorate.exception.DuplicateException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Events;
+import ru.yandex.practicum.filmorate.model.Operations;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.validation.UserValidator;
+import ru.yandex.practicum.filmorate.storage.AuditStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.FriendsStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -38,6 +42,9 @@ public class UserService {
     @Autowired
     @Qualifier("db-friends")
     private FriendsStorage friendStorage;
+    @Autowired
+    @Qualifier("db-audit")
+    private AuditStorage auditStorage;
     @Autowired
     private UserValidator userValidator;
 
@@ -121,6 +128,7 @@ public class UserService {
         }
 
         friendStorage.addFriend(user, friend);
+        auditStorage.addEvent(userId, Events.FRIEND, Operations.ADD, friendId);
     }
 
     public void deleteFriend(Long userId, Long friendId) {
@@ -141,6 +149,7 @@ public class UserService {
         }
 
         friendStorage.removeFriend(user, friend);
+        auditStorage.addEvent(userId, Events.FRIEND, Operations.REMOVE, friendId);
     }
 
     public Collection<UserDto> findCommonFriends(Long userId, Long friendId) {
@@ -167,8 +176,14 @@ public class UserService {
                 .toList();
     }
     public Collection<AuditDto> getFeed(Long userId) {
+        if (userId < 1) {
+            log.warn("Передан ID = {} меньше 1", userId);
+            throw new ValidationException("Идентификатор пользователя не может быть менее 1.");
+        }
 
-        return null;
+        return auditStorage.getEventsForUser(userId).stream()
+                .map(AuditMapper::mapToAuditDto)
+                .toList();
     }
 
 }

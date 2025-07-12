@@ -86,7 +86,7 @@ public class UserController {
 
     @GetMapping("/{id}/feed")
     public Collection<AuditDto> getFeed(@PathVariable("id") @NotNull Long userId) {
-        log.info("Получен запрос за ленту событий пользователя с ID = {}", userId);
+        log.info("Получен запрос на ленту событий пользователя с ID = {}", userId);
         return userService.getFeed(userId);
     }
 

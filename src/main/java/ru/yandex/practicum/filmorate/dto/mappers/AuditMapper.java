@@ -13,24 +13,25 @@ import java.util.Arrays;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AuditMapper {
     public static AuditDto mapToAuditDto(Audit audit) {
-        String eventType = Arrays.stream(Events.values())
-                .filter(e -> e.getEventId().equals(audit.getEventId()))
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException("Не найден тип события с id = " + audit.getEventId()))
-                .toString();
-
-        String operation = Arrays.stream(Operations.values())
-                .filter(e -> e.getOperationId().equals(audit.getOperationId()))
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException("Не найден тип операции с id = " + audit.getOperationId()))
-                .toString();
+//        String eventType = Arrays.stream(Events.values())
+//                .filter(e -> e.getEventId().equals(audit.getEvent().))
+//                .findFirst()
+//                .orElseThrow(() -> new NotFoundException("Не найден тип события с id = " + audit.getEventId()))
+//                .toString();
+//
+//        String operation = Arrays.stream(Operations.values())
+//                .filter(e -> e.getOperationId().equals(audit.getOperationId()))
+//                .findFirst()
+//                .orElseThrow(() -> new NotFoundException("Не найден тип операции с id = " + audit.getOperationId()))
+//                .toString();
 
         return AuditDto.builder()
                 .eventId(audit.getId())
                 .timestamp(audit.getTimestamp())
                 .userId(audit.getUserId())
-                .eventType(eventType)
-                .operation(operation)
+                .eventType(audit.getEvent().toString())
+                .operation(audit.getOperation().toString())
+                .entityId(audit.getEntityId())
                 .build();
     }
 }

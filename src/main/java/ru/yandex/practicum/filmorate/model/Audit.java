@@ -11,7 +11,7 @@ public class Audit {
     private Long id;
     private Instant timestamp;
     private Long userId;
-    private Integer eventId;
-    private Integer operationId;
+    private Events event;
+    private Operations operation;
     private Long entityId;
 }

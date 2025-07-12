@@ -11,7 +11,9 @@ import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.dto.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Events;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Operations;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.validation.FilmValidator;
 import ru.yandex.practicum.filmorate.storage.*;
@@ -41,6 +43,9 @@ public class FilmService {
     @Autowired
     @Qualifier("db-directorsFilms")
     private DirectorsFilmsDbStorage directorsFilmsDbStorage;
+    @Autowired
+    @Qualifier("db-audit")
+    private AuditStorage auditStorage;
     @Autowired
     private FilmValidator filmValidator;
 
@@ -133,6 +138,7 @@ public class FilmService {
         likes.add(userId);
         film.setLikesByUsers(likes);
         likeStorage.addLikeOnFilm(filmId, userId);
+        auditStorage.addEvent(userId, Events.LIKE, Operations.ADD, filmId);
     }
 
     public void deleteLike(Long filmId, Long userId) {
@@ -152,6 +158,7 @@ public class FilmService {
         likes.remove(userId);
         film.setLikesByUsers(likes);
         likeStorage.removeLikeOnFilm(filmId, userId);
+        auditStorage.addEvent(userId, Events.LIKE, Operations.REMOVE, filmId);
     }
 
     public Collection<FilmDto> getPopularFilms(Long count, Long genreId, Long year) {
