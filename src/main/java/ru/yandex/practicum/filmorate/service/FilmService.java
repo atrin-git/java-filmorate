@@ -180,15 +180,15 @@ public class FilmService {
     }
 
     public Collection<FilmDto> getFilmsByDirector(Long directorId, String sortBy) {
-        Collection<FilmDto> REST = directorsFilmsDbStorage.getDirectorOnFilm(directorId)
+        Collection<FilmDto> result = directorsFilmsDbStorage.getDirectorOnFilm(directorId)
                 .stream()
                 .peek(filmStorage::addGenresAndLikes)
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
         if ("year".equals(sortBy)) {
-            return REST;
+            return result;
         }
-        return REST.stream().sorted((f1, f2) -> f2.getLikesByUsers().size() - f1.getLikesByUsers().size())
+        return result.stream().sorted((f1, f2) -> f2.getLikesByUsers().size() - f1.getLikesByUsers().size())
                 .toList();
     }
 }
