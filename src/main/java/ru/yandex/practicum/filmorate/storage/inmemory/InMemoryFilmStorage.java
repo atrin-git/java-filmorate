@@ -110,9 +110,4 @@ public class InMemoryFilmStorage implements FilmStorage {
 
         return Optional.of(films.get(id));
     }
-
-    @Override
-    public Collection<Film> getCommonFilms(Long userId, Long friendId) {
-        return null;
-    }
 }

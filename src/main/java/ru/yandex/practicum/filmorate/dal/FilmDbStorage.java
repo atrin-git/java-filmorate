@@ -63,14 +63,6 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     GROUP BY film_id
     HAVING COUNT(DISTINCT user_id) = 2)
     """;
-    public static final String GET_COMMON_FILMS_QUERY = """
-            SELECT *
-            FROM films
-            WHERE id IN (SELECT DISTINCT film_id
-                         FROM likes_on_films
-                         WHERE user_id=? OR user_id=?
-                         GROUP BY film_id
-                         HAVING COUNT(DISTINCT user_id) = 2)""";
 
     public FilmDbStorage(JdbcTemplate jdbc, RowMapper<Film> mapper) {
         super(jdbc, mapper);
