@@ -19,4 +19,6 @@ public interface FilmStorage {
     Collection<Film> getAll();
 
     Collection<Film> getCommonFilms(Long userId, Long friendId);
+
+    Collection<Film> getRecommendedFilms(Long userId);
 }

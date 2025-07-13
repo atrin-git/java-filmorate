@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.dal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ import ru.yandex.practicum.filmorate.storage.RatesStorage;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -48,6 +50,24 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                          WHERE user_id=? OR user_id=?
                          GROUP BY film_id
                          HAVING COUNT(DISTINCT user_id) = 2)""";
+    private static final String GET_USER_FOR_RECOMMENDATIONS = """
+            select user_id
+            FROM (SELECT l2.user_id, COUNT(*) AS common_films
+                  FROM likes_on_films l1 JOIN likes_on_films l2 ON l1.film_id = l2.film_id
+                  WHERE l1.user_id = ? AND l2.user_id != ?
+                  GROUP BY l2.user_id
+                  ORDER BY common_films DESC
+                  LIMIT 1)""";
+    private static final String GET_RECOMMENDED_FILMS = """
+            SELECT *
+            FROM films
+            WHERE id IN (SELECT film_id
+                         FROM likes_on_films
+                         WHERE user_id = ?
+                         EXCEPT
+                         SELECT film_id
+                         FROM likes_on_films
+                         WHERE user_id = ?)""";
 
     public FilmDbStorage(JdbcTemplate jdbc, RowMapper<Film> mapper) {
         super(jdbc, mapper);
@@ -127,9 +147,26 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         return films;
     }
 
+    @Override
     public Collection<Film> getCommonFilms(Long userId, Long friendId) {
         Collection<Film> films = findMany(GET_COMMON_FILMS_QUERY, userId, friendId);
 
+        films.forEach(this::addGenresAndLikes);
+
+        return films;
+    }
+
+    @Override
+    public Collection<Film> getRecommendedFilms(Long user1Id) {
+        Long user2Id;
+
+        try {
+            user2Id = jdbc.queryForObject(GET_USER_FOR_RECOMMENDATIONS, Long.class, user1Id, user1Id);
+        } catch (EmptyResultDataAccessException e) {
+            log.info("Для пользователя {}, нет рекомендуемых фильмов", user1Id);
+            return List.of(); // тесты в постмане ожидают пустой список
+        }
+        Collection<Film> films = findMany(GET_RECOMMENDED_FILMS, user2Id, user1Id);
         films.forEach(this::addGenresAndLikes);
 
         return films;

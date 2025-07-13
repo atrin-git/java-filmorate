@@ -49,8 +49,8 @@ class FilmDBStorageTests {
 
     @Test
     public void checkDeleteAllFilms() {
-        Film createdFilm1 = filmStorage.create(GenerateTestData.generateNewFilm(List.of(1L)));
-        Film createdFilm2 = filmStorage.create(GenerateTestData.generateNewFilm(List.of(2L)));
+        filmStorage.create(GenerateTestData.generateNewFilm(List.of(1L)));
+        filmStorage.create(GenerateTestData.generateNewFilm(List.of(2L)));
         filmStorage.deleteAll();
         Collection<Film> films = filmStorage.getAll();
 
@@ -93,5 +93,39 @@ class FilmDBStorageTests {
         Collection<Film> films = filmStorage.getCommonFilms(user1.getId(), user2.getId());
 
         assertEquals(1, films.size(), "Общие фильмы не вернулись");
+    }
+
+    @Test
+    public void checkGetRecommendationsForUser1_WhenCommonFilmExists() {
+        User user1 = userStorage.create(GenerateTestData.generateNewUser(List.of(1L)));
+        User user2 = userStorage.create(GenerateTestData.generateNewUser(List.of(2L)));
+
+        Film commonFilm = filmStorage.create(GenerateTestData.generateNewFilm(List.of(1L)));
+        Film uncommonFilm = filmStorage.create(GenerateTestData.generateNewFilm(List.of(2L)));
+
+        likesStorage.addLikeOnFilm(commonFilm.getId(), user1.getId());
+        likesStorage.addLikeOnFilm(commonFilm.getId(), user2.getId());
+        likesStorage.addLikeOnFilm(uncommonFilm.getId(), user2.getId());
+
+        Collection<Film> films = filmStorage.getRecommendedFilms(user1.getId());
+
+        assertEquals(1, films.size());
+        assertEquals(uncommonFilm.getId(), films.iterator().next().getId());
+    }
+
+    @Test
+    public void checkGetRecommendationsForUser1_WhenCommonFilmDoesntExist() {
+        User user1 = userStorage.create(GenerateTestData.generateNewUser(List.of(1L)));
+        User user2 = userStorage.create(GenerateTestData.generateNewUser(List.of(2L)));
+
+        Film uncommonFilm1 = filmStorage.create(GenerateTestData.generateNewFilm(List.of(1L)));
+        Film uncommonFilm2 = filmStorage.create(GenerateTestData.generateNewFilm(List.of(2L)));
+
+        likesStorage.addLikeOnFilm(uncommonFilm1.getId(), user1.getId());
+        likesStorage.addLikeOnFilm(uncommonFilm2.getId(), user2.getId());
+
+        Collection<Film> films = filmStorage.getRecommendedFilms(user1.getId());
+
+        assertEquals(0, films.size());
     }
 }

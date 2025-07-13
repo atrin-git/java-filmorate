@@ -104,6 +104,11 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Collection<Film> getCommonFilms(Long userId, Long friendId) {
-        return null;
+        return List.of();
+    }
+
+    @Override
+    public Collection<Film> getRecommendedFilms(Long userId) {
+        return List.of();
     }
 }
