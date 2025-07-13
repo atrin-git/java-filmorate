@@ -94,7 +94,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void addGenresAndLikes(Film film) {}
+    public void addGenresAndLikes(Film film) {
+    }
 
     @Override
     public Optional<Film> find(Long id) {
