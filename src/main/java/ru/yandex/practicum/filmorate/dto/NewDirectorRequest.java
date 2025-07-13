@@ -1,10 +1,10 @@
 package ru.yandex.practicum.filmorate.dto;
 
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-@Builder(toBuilder = true)
+@NoArgsConstructor
 public class NewDirectorRequest extends BaseDirectorRequest {
 
     private String name;
