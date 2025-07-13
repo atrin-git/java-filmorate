@@ -124,7 +124,6 @@ public class UserService {
         final User user = userStorage.find(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + userId));
 
-
         final User friend = userStorage.find(friendId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + friendId));
 
