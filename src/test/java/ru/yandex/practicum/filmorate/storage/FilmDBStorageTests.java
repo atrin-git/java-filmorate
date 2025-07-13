@@ -20,7 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Import({FilmDbStorage.class, GenresDbStorage.class, LikesDbStorage.class, RatesDbStorage.class,
         FilmRowMapper.class, GenresRowMapper.class, LikesRowMapper.class, RatesRowMapper.class,
-        UserDbStorage.class, UserRowMapper.class})
+        UserDbStorage.class, UserRowMapper.class, DirectorDbStorage.class, DirectorsFilmsDbStorage.class, DirectorsRowMapper.class})
+
 class FilmDBStorageTests {
     private final FilmDbStorage filmStorage;
     private final UserDbStorage userStorage;

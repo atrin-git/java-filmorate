@@ -8,14 +8,9 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Likes;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.GenresStorage;
-import ru.yandex.practicum.filmorate.storage.LikesStorage;
-import ru.yandex.practicum.filmorate.storage.RatesStorage;
+import ru.yandex.practicum.filmorate.storage.*;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -31,23 +26,43 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     @Autowired
     @Qualifier("db-rates")
     private RatesStorage ratesStorage;
+    @Autowired
+    @Qualifier("db-directorsFilms")
+    private DirectorsFilmsStorage directorsFilmsStorage;
 
-    private static final String FIND_ALL_FILMS_QUERY = "SELECT * FROM films";
-    private static final String FIND_FILM_QUERY = "SELECT * FROM films WHERE id = ?";
-    private static final String INSERT_QUERY = "INSERT INTO films(name, description, release_date, duration, rating_id) " +
-            "VALUES (?, ?, ?, ?, ?)";
-    private static final String UPDATE_QUERY = "UPDATE films SET " +
-            "name = ?, description = ?, release_date = ?, duration = ?, rating_id = ? WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM films WHERE id = ?";
     private static final String DELETE_ALL_QUERY = "DELETE FROM films";
+    private static final String FIND_ALL_FILMS_QUERY = "SELECT * FROM films";
+    private static final String FIND_FILM_QUERY = "SELECT * FROM films WHERE id = ?";
+    private static final String INSERT_QUERY = """
+    INSERT INTO films (
+    name,
+    description,
+    release_date,
+    duration,
+    rating_id
+    )
+    VALUES (?, ?, ?, ?, ?)
+    """;
+    private static final String UPDATE_QUERY = """
+    UPDATE films
+    SET
+    name = ?,
+    description = ?,
+    release_date = ?,
+    duration = ?,
+    rating_id = ?
+    WHERE id = ?
+    """;
     public static final String GET_COMMON_FILMS_QUERY = """
-            SELECT *
-            FROM films
-            WHERE id IN (SELECT DISTINCT film_id
-                         FROM likes_on_films
-                         WHERE user_id=? OR user_id=?
-                         GROUP BY film_id
-                         HAVING COUNT(DISTINCT user_id) = 2)""";
+    SELECT *
+    FROM films
+    WHERE id IN (SELECT DISTINCT film_id
+    FROM likes_on_films
+    WHERE user_id=? OR user_id=?
+    GROUP BY film_id
+    HAVING COUNT(DISTINCT user_id) = 2)
+    """;
 
     public FilmDbStorage(JdbcTemplate jdbc, RowMapper<Film> mapper) {
         super(jdbc, mapper);
@@ -63,15 +78,18 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                 film.getDuration(),
                 film.getRating().getId()
         );
-
         film.setId(id);
-
         if (film.getGenres() != null) {
             genresStorage.setGenresForFilm(id, film.getGenres());
+        } else {
+            film.setGenres(Set.of());
         }
-
+        if (film.getDirectors() != null) {
+            directorsFilmsStorage.setDirectorsForFilm(film.getId(), film.getDirectors());
+        } else {
+            film.setDirectors(Set.of());
+        }
         ratesStorage.getFilmRating(id).ifPresent(film::setRating);
-
         return film;
     }
 
@@ -101,6 +119,11 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                 film.getRating().getId(),
                 film.getId()
         );
+        if (film.getDirectors() != null) {
+            directorsFilmsStorage.setDirectorsForFilm(film.getId(), film.getDirectors());
+        } else {
+            film.setDirectors(Set.of());
+        }
         return film;
     }
 
@@ -110,9 +133,7 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                 FIND_FILM_QUERY,
                 id
         );
-
         film.ifPresent(this::addGenresAndLikes);
-
         return film;
     }
 
@@ -121,21 +142,17 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         Collection<Film> films = findMany(
                 FIND_ALL_FILMS_QUERY
         );
-
         films.forEach(this::addGenresAndLikes);
-
         return films;
     }
 
     public Collection<Film> getCommonFilms(Long userId, Long friendId) {
         Collection<Film> films = findMany(GET_COMMON_FILMS_QUERY, userId, friendId);
-
         films.forEach(this::addGenresAndLikes);
-
         return films;
     }
 
-    private void addGenresAndLikes(Film film) {
+    public void addGenresAndLikes(Film film) {
         film.setGenres(
                 new HashSet<>(genresStorage.getGenresForFilm(film.getId()))
         );
@@ -143,6 +160,9 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                 likeStorage.getLikesOnFilm(film.getId()).stream()
                         .map(Likes::getUserId)
                         .collect(Collectors.toSet())
+        );
+        film.setDirectors(
+                new HashSet<>(directorsFilmsStorage.getDirectorsForFilm(film.getId()))
         );
         ratesStorage.getFilmRating(film.getId()).ifPresent(film::setRating);
     }

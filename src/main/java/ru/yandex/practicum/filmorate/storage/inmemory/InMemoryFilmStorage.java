@@ -89,6 +89,15 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public Collection<Film> getCommonFilms(Long userId, Long friendId) {
+        return List.of();
+    }
+
+    @Override
+    public void addGenresAndLikes(Film film) {
+    }
+
+    @Override
     public Optional<Film> find(Long id) {
         if (id == null || id <= 0) {
             log.warn("Передано значение id = {}", id);
@@ -100,10 +109,5 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
 
         return Optional.of(films.get(id));
-    }
-
-    @Override
-    public Collection<Film> getCommonFilms(Long userId, Long friendId) {
-        return null;
     }
 }
