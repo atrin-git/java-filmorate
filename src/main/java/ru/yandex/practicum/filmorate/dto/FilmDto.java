@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rates;
 
@@ -23,4 +24,5 @@ public class FilmDto {
     private Integer duration;
 
     private Set<Long> likesByUsers;
+    private Collection<Director> directors;
 }
