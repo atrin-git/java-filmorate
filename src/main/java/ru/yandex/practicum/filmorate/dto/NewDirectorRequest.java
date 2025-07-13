@@ -9,11 +9,5 @@ public class NewDirectorRequest extends BaseDirectorRequest {
 
     private String name;
 
-    public NewDirectorRequest() {
-    }
-
-    public NewDirectorRequest(String name) {
-        this.name = name;
-    }
 }
 
