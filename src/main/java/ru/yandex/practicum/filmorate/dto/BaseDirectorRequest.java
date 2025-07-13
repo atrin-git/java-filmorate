@@ -1,4 +1,7 @@
 package ru.yandex.practicum.filmorate.dto;
 
-public class BaseDirectorRequest {
+import lombok.Data;
+
+@Data
+public abstract class BaseDirectorRequest {
 }

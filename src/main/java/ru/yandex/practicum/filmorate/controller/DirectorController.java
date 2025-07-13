@@ -42,7 +42,7 @@ public class DirectorController {
     }
 
     @GetMapping
-    public Collection<Director> findAll() {
+    public Collection<DirectorDto> findAll() {
         log.info("Получен запрос на получение всех режиссеров");
         return directorService.findAll();
     }

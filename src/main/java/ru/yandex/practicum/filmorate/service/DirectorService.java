@@ -20,8 +20,8 @@ public class DirectorService {
     @Qualifier("db-directors")
     private DirectorStorage directorStorage;
 
-    public Collection<Director> findAll() {
-        return directorStorage.findAll().stream().toList();
+    public Collection<DirectorDto> findAll() {
+        return directorStorage.findAll().stream().map(DirectorMapper::mapToDirectorDto).toList();
     }
 
     public Director find(Long id) {
