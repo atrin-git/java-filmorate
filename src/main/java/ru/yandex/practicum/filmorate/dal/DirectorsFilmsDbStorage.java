@@ -16,17 +16,17 @@ public class DirectorsFilmsDbStorage implements DirectorsFilmsStorage {
     private final JdbcTemplate jdbc;
     private static final String INSERT_DIRECTORS_FILMS_QUERY = "INSERT INTO directors_on_films (director_id, film_id) VALUES (?, ?)";
     private static final String FIND_FILMS_DIRECTORS_QUERY = """
-    SELECT films.*
-    FROM Films
-    JOIN directors_on_films ON Films.id = directors_on_films.film_id
-    WHERE directors_on_films.director_id = ?
-    ORDER BY Films.release_date
+    SELECT f.*
+    FROM Films AS f
+    JOIN directors_on_films AS dof ON f.id = dof.film_id
+    WHERE dof.director_id = ?
+    ORDER BY f.release_date
     """;
     private static final String FIND_DIRECTOR_FILM_QUERY = """
-    SELECT directors.*
-    FROM directors
-    JOIN directors_on_films ON directors.id = directors_on_films.director_id
-    WHERE directors_on_films.film_id = ?
+    SELECT d.*
+    FROM directors AS d
+    JOIN directors_on_films AS dof ON d.id = dof.director_id
+    WHERE dof.film_id = ?
     """;
 
     public DirectorsFilmsDbStorage(JdbcTemplate jdbc, RowMapper<Director> directorRowMapper, RowMapper<Film> filmRowMapper) {
