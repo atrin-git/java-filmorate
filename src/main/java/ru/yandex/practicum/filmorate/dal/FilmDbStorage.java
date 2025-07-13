@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.dal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ import ru.yandex.practicum.filmorate.storage.RatesStorage;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -48,6 +50,26 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                          WHERE user_id=? OR user_id=?
                          GROUP BY film_id
                          HAVING COUNT(DISTINCT user_id) = 2)""";
+
+    public static final String GET_USER_FOR_RECOMMENDATIONS = """
+                select user_id
+                FROM (SELECT l2.user_id, COUNT(*) AS common_films
+                      FROM LIKES_ON_FILMS l1 JOIN LIKES_ON_FILMS l2 ON l1.FILM_ID = l2.FILM_ID
+                      WHERE l1.user_id = ? AND l2.user_id != ?
+                      GROUP BY l2.user_id
+                      ORDER BY common_films DESC
+                      LIMIT 1)""";
+
+    public static final String GET_RECOMMENDED_FILMS = """
+                select *
+                from FILMS
+                WHERE id IN (select FILM_ID
+                             from LIKES_ON_FILMS
+                             where USER_ID = ?
+                             except
+                             select FILM_ID
+                             from LIKES_ON_FILMS
+                             where USER_ID = ?)""";
 
     public FilmDbStorage(JdbcTemplate jdbc, RowMapper<Film> mapper) {
         super(jdbc, mapper);
@@ -136,25 +158,17 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     }
 
     @Override
-    public Collection<Film> getRecommendations(Long userId) {
-        String GET_RECOMMENDED_FILMS = """
-                SELECT *
-                FROM films
-                WHERE id IN (SELECT film_id
-                             FROM likes_on_films
-                             WHERE user_id IN (SELECT user_id
-                                              FROM (SELECT l2.user_id, COUNT(*) AS common_films
-                                                    FROM likes_on_films l1 JOIN likes_on_films l2 ON l1.film_id = l2.film_id
-                                                    WHERE l1.user_id = ? AND l2.user_id != ?
-                                                    GROUP BY l2.user_id
-                                                    ORDER BY common_films DESC
-                                                    LIMIT 1))
-                             EXCEPT
-                             SELECT film_id
-                             FROM likes_on_films
-                             WHERE user_id = ?)""";
+    public Collection<Film> getRecommendations(Long user1Id) {
+        Long user2Id;
 
-        return findMany(GET_RECOMMENDED_FILMS, userId, userId, userId);
+        try {
+             user2Id = jdbc.queryForObject(GET_USER_FOR_RECOMMENDATIONS, Long.class, user1Id, user1Id);
+        } catch (EmptyResultDataAccessException e) {
+            log.info("Для пользователя {}, нет рекомендуемых фильмов", user1Id);
+            return List.of(); // тесты в постмане ожидают пустой список в тестах
+        }
+
+        return findMany(GET_RECOMMENDED_FILMS, user2Id, user1Id);
     }
 
     private void addGenresAndLikes(Film film) {
