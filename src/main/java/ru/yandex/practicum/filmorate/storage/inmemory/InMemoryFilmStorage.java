@@ -94,8 +94,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void addGenresAndLikes(Film film) {
-    }
+    public void addGenresAndLikes(Film film) {}
 
     @Override
     public Optional<Film> find(Long id) {
@@ -109,5 +108,10 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
 
         return Optional.of(films.get(id));
+    }
+
+    @Override
+    public Collection<Film> getRecommendedFilms(Long userId) {
+        return List.of();
     }
 }

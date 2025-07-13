@@ -4,15 +4,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.UserDto;
+import ru.yandex.practicum.filmorate.dto.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.dto.mappers.UserMapper;
 import ru.yandex.practicum.filmorate.exception.DuplicateException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.validation.UserValidator;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.FriendsStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -27,6 +31,9 @@ public class UserService {
     @Autowired
     @Qualifier("db")
     private UserStorage userStorage;
+    @Autowired
+    @Qualifier("db-films")
+    private FilmStorage filmStorage;
     @Autowired
     @Qualifier("db-friends")
     private FriendsStorage friendStorage;
@@ -152,4 +159,10 @@ public class UserService {
                 .toList();
     }
 
+    public Collection<FilmDto> getRecommendedFilms(Long userId) {
+        Collection<Film> films = filmStorage.getRecommendedFilms(userId);
+        return films.stream()
+                .map(FilmMapper::mapToFilmDto)
+                .toList();
+    }
 }
