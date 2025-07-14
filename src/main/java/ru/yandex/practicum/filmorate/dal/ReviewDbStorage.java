@@ -15,58 +15,58 @@ import java.util.Optional;
 public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStorage {
 
     private static final String FIND_REVIEW_QUERY = """
-                                                    SELECT r.id, r.film_id, r.user_id, r.isPositive, r.content,
-                                                            COALESCE(SUM(
-                                                                CASE
-                                                                    WHEN rr.isLike = TRUE THEN 1
-                                                                    WHEN rr.isLike = FALSE THEN -1
-                                                                    ELSE 0
-                                                                END
-                                                            ), 0) AS useful
-                                                    FROM reviews AS r 
-                                                        LEFT JOIN ratings_on_reviews AS rr
-                                                        ON rr.review_id = r.id
-                                                    WHERE id = ?
-                                                    GROUP BY r.id, r.film_id, r.user_id, r.isPositive, r.content
-                                                    """;
+            SELECT r.id, r.film_id, r.user_id, r.isPositive, r.content,
+            COALESCE(SUM(
+            CASE
+            WHEN rr.isLike = TRUE THEN 1
+            WHEN rr.isLike = FALSE THEN -1
+            ELSE 0
+            END
+            ), 0) AS useful
+            FROM reviews AS r 
+            LEFT JOIN ratings_on_reviews AS rr
+            ON rr.review_id = r.id
+            WHERE id = ?
+            GROUP BY r.id, r.film_id, r.user_id, r.isPositive, r.content
+            """;
     private static final String INSERT_QUERY = "INSERT INTO reviews(film_id, user_id, isPositive, content)" +
             "VALUES(?, ?, ?, ?)";
     private static final String UPDATE_QUERY = "UPDATE reviews SET " +
             "film_id = ?, user_id = ?, isPositive = ?, content = ? WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM reviews WHERE id = ?";
     private static final String FIND_LIMITED_REVIEWS_QUERY = """
-                                                             SELECT r.id, r.film_id, r.user_id, r.isPositive, r.content, 
-                                                                     COALESCE(SUM(
-                                                                         CASE
-                                                                            WHEN rr.isLike = TRUE THEN 1
-                                                                            WHEN rr.isLike = FALSE THEN -1
-                                                                            ELSE 0
-                                                                         END
-                                                                     ), 0) AS useful
-                                                             FROM reviews AS r
-                                                                LEFT JOIN ratings_on_reviews AS rr
-                                                                ON rr.review_id = r.id
-                                                             GROUP BY r.id, r.film_id, r.user_id, r.isPositive, r.content
-                                                             ORDER BY useful DESC
-                                                             LIMIT ?
-                                                             """;
+            SELECT r.id, r.film_id, r.user_id, r.isPositive, r.content, 
+            COALESCE(SUM(
+            CASE
+            WHEN rr.isLike = TRUE THEN 1
+            WHEN rr.isLike = FALSE THEN -1
+            ELSE 0
+            END
+            ), 0) AS useful
+            FROM reviews AS r
+            LEFT JOIN ratings_on_reviews AS rr
+            ON rr.review_id = r.id
+            GROUP BY r.id, r.film_id, r.user_id, r.isPositive, r.content
+            ORDER BY useful DESC
+            LIMIT ?
+            """;
     private static final String FIND_LIMITED_REVIEWS_BY_FILM_ID_QUERY = """
-                                                                        SELECT r.id, r.film_id, r.user_id, r.isPositive, r.content, 
-                                                                                COALESCE(SUM(
-                                                                                     CASE
-                                                                                        WHEN rr.isLike = TRUE THEN 1
-                                                                                        WHEN rr.isLike = FALSE THEN -1
-                                                                                        ELSE 0
-                                                                                     END
-                                                                                 ), 0) AS useful 
-                                                                        FROM reviews AS r
-                                                                            LEFT JOIN ratings_on_reviews AS rr
-                                                                            ON rr.review_id = r.id
-                                                                        WHERE film_id = ?
-                                                                        GROUP BY r.id, r.film_id, r.user_id, r.isPositive, r.content
-                                                                        ORDER BY useful DESC
-                                                                        LIMIT ?
-                                                                        """;
+            SELECT r.id, r.film_id, r.user_id, r.isPositive, r.content, 
+            COALESCE(SUM(
+            CASE
+            WHEN rr.isLike = TRUE THEN 1
+            WHEN rr.isLike = FALSE THEN -1
+            ELSE 0
+            END
+            ), 0) AS useful 
+            FROM reviews AS r
+            LEFT JOIN ratings_on_reviews AS rr
+            ON rr.review_id = r.id
+            WHERE film_id = ?
+            GROUP BY r.id, r.film_id, r.user_id, r.isPositive, r.content
+            ORDER BY useful DESC
+            LIMIT ?
+            """;
 
     public ReviewDbStorage(JdbcTemplate jdbc, RowMapper<Review> mapper) {
         super(jdbc, mapper);
