@@ -26,7 +26,7 @@ public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStor
             FROM reviews AS r
             LEFT JOIN ratings_on_reviews AS rr
             ON rr.review_id = r.id
-            WHERE id = ?
+            WHERE r.id = ?
             GROUP BY r.id, r.film_id, r.user_id, r.isPositive, r.content
             """;
     private static final String INSERT_QUERY = "INSERT INTO reviews(film_id, user_id, isPositive, content)" +
@@ -62,7 +62,7 @@ public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStor
             FROM reviews AS r
             LEFT JOIN ratings_on_reviews AS rr
             ON rr.review_id = r.id
-            WHERE film_id = ?
+            WHERE r.film_id = ?
             GROUP BY r.id, r.film_id, r.user_id, r.isPositive, r.content
             ORDER BY useful DESC
             LIMIT ?

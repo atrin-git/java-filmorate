@@ -11,7 +11,7 @@ import ru.yandex.practicum.filmorate.storage.ReviewRatingStorage;
 @Component
 public class ReviewRatingDbStorage extends BaseDbStorage implements ReviewRatingStorage {
 
-    public static final String INSERT_QUERY = "INSERT INTO ratings_on_reviews(user_id, review_id, isLike)" +
+    public static final String INSERT_QUERY = "MERGE INTO ratings_on_reviews(user_id, review_id, isLike)" +
             "VALUES (?, ?, ?)";
     public static final String DELETE_QUERY = "DELETE FROM ratings_on_reviews " +
             "WHERE user_id = ? AND review_id = ?";

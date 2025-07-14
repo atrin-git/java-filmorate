@@ -60,28 +60,24 @@ public class ReviewController {
     }
 
     @PutMapping("/{id}/like/{userId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addLike(@PathVariable("id") Long reviewId, @PathVariable("userId") Long userId) {
         log.info("Получен запрос на добавление лайка на отзыв с id: {}, пользователем с id: {}", reviewId, userId);
         reviewService.addRating(reviewId, userId, true);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteLike(@PathVariable("id") Long reviewId, @PathVariable("userId") Long userId) {
         log.info("Получен запрос на удаление лайка на отзыве с id: {}, пользователем с id: {}", reviewId, userId);
         reviewService.deleteRating(reviewId, userId);
     }
 
     @PutMapping("/{id}/dislike/{userId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addDislike(@PathVariable("id")  Long reviewId, @PathVariable("userId") Long userId) {
         log.info("Получен запрос на добавление дизлайка на отзыв с id: {}, пользователем с id: {}", reviewId, userId);
         reviewService.addRating(reviewId, userId, false);
     }
 
     @DeleteMapping("/{id}/dislike/{userId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteDislike(@PathVariable("id") Long reviewId, @PathVariable("userId") Long userId) {
         log.info("Получен запрос на удаление дизлайка на отзыве с id: {}, пользователем с id: {}", reviewId, userId);
         reviewService.deleteRating(reviewId, userId);
