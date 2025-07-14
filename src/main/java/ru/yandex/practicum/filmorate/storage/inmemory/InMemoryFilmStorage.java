@@ -110,4 +110,9 @@ public class InMemoryFilmStorage implements FilmStorage {
 
         return Optional.of(films.get(id));
     }
+
+    @Override
+    public Collection<Film> getRecommendedFilms(Long userId) {
+        return List.of();
+    }
 }
