@@ -21,5 +21,7 @@ public interface FilmStorage {
 
     Collection<Film> getCommonFilms(Long userId, Long friendId);
 
+    Collection<Film> getRecommendedFilms(Long userId);
+
     void addGenresAndLikes(Film film);
 }
