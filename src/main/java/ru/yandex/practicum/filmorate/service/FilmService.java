@@ -15,6 +15,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.validation.FilmValidator;
 import ru.yandex.practicum.filmorate.storage.*;
+
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
@@ -108,10 +109,10 @@ public class FilmService {
         if (filmId == null || filmId < 1)
             throw new ValidationException("Указан некорректный id пользователя");
         filmStorage.find(filmId)
-                        .orElseThrow(() -> {
-                            log.warn("Не найден фильм с ID = {}", filmId);
-                            return new NotFoundException("Фильм не найден с ID: "  + filmId);
-                        });
+                .orElseThrow(() -> {
+                    log.warn("Не найден фильм с ID = {}", filmId);
+                    return new NotFoundException("Фильм не найден с ID: " + filmId);
+                });
 
         filmStorage.delete(filmId);
     }
@@ -165,7 +166,7 @@ public class FilmService {
             filmStream = filmStream.filter(film -> film.getReleaseDate().getYear() == year);
         }
         return filmStream.sorted((film1, film2) -> Integer.compare(film2.getLikesByUsers()
-                .size(), film1.getLikesByUsers().size()))
+                        .size(), film1.getLikesByUsers().size()))
                 .limit(count)
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
@@ -189,6 +190,16 @@ public class FilmService {
             return result;
         }
         return result.stream().sorted((f1, f2) -> f2.getLikesByUsers().size() - f1.getLikesByUsers().size())
+                .toList();
+    }
+
+    public Collection<FilmDto> searchFilmsByDirectorOrTitle(String substring, String by) {
+
+        Collection<Film> films = filmStorage.searchFilmsByDirectorOrTitle(substring, by);
+
+        return films.stream()
+                .sorted((f1, f2) -> f2.getLikesByUsers().size() - f1.getLikesByUsers().size())
+                .map(FilmMapper::mapToFilmDto)
                 .toList();
     }
 }

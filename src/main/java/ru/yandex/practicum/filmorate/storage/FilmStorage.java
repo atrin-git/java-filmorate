@@ -24,4 +24,6 @@ public interface FilmStorage {
     Collection<Film> getRecommendedFilms(Long userId);
 
     void addGenresAndLikes(Film film);
+
+    Collection<Film> searchFilmsByDirectorOrTitle(String substring, String by);
 }

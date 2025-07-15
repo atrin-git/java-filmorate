@@ -8,7 +8,9 @@ import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.NewFilmRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.service.FilmService;
+
 import java.util.Collection;
+
 import static ru.yandex.practicum.filmorate.utils.Utils.clearStringData;
 
 @Slf4j
@@ -85,5 +87,12 @@ public class FilmController {
     public Collection<FilmDto> getFilmsByDirector(@PathVariable Long directorId,
                                                   @RequestParam(required = false) String sortBy) {
         return filmService.getFilmsByDirector(directorId, sortBy);
+    }
+
+    @GetMapping("/search")
+    public Collection<FilmDto> searchFilmsByDirectorOrTitle(@RequestParam(value = "query") String substring,
+                                                            @RequestParam(value = "by") String by) {
+        log.info("Получен запрос на поиск фильмов. Подстрока: \"{}\". Значение параметра by \"{}\"", substring, by);
+        return filmService.searchFilmsByDirectorOrTitle(substring, by);
     }
 }
