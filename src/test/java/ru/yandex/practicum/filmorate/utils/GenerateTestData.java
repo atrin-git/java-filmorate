@@ -3,10 +3,7 @@ package ru.yandex.practicum.filmorate.utils;
 import ru.yandex.practicum.filmorate.model.*;
 
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 import static ru.yandex.practicum.filmorate.utils.Utils.getNextId;
 
@@ -53,7 +50,7 @@ public class GenerateTestData {
                 .duration(duration)
                 .rating(rate)
                 .genres(genres)
-                .likesByUsers(Set.of())
+                .likesByUsers(new HashSet<>())
                 .build();
 
     }
@@ -76,5 +73,16 @@ public class GenerateTestData {
         return Director.builder()
                 .id(getNextId(longs))
                 .name(generateString(nameLength)).build();
+    }
+
+    public static Review generateNewReview(List<Long> longs, Long userId, Long filmId, Boolean isPositive) {
+        return Review.builder()
+                .id(getNextId(longs))
+                .userId(userId)
+                .content(generateString(50))
+                .filmId(filmId)
+                .isPositive(isPositive)
+                .useful(new Random().nextInt(10))
+                .build();
     }
 }

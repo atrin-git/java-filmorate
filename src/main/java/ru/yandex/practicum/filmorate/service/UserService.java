@@ -4,11 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dto.AuditDto;
-import ru.yandex.practicum.filmorate.dto.FilmDto;
-import ru.yandex.practicum.filmorate.dto.NewUserRequest;
-import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
-import ru.yandex.practicum.filmorate.dto.UserDto;
+import ru.yandex.practicum.filmorate.aspects.Auditable;
+import ru.yandex.practicum.filmorate.dto.*;
 import ru.yandex.practicum.filmorate.dto.mappers.AuditMapper;
 import ru.yandex.practicum.filmorate.dto.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.dto.mappers.UserMapper;
@@ -16,8 +13,8 @@ import ru.yandex.practicum.filmorate.exception.DuplicateException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Events;
-import ru.yandex.practicum.filmorate.model.Operations;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Operations;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.validation.UserValidator;
 import ru.yandex.practicum.filmorate.storage.AuditStorage;
@@ -110,6 +107,7 @@ public class UserService {
                 .toList();
     }
 
+    @Auditable(eventName = Events.FRIEND, operationName = Operations.ADD, userId = "#userId", entityId = "#friendId")
     public void addFriend(Long userId, Long friendId) {
         final User user = userStorage.find(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + userId));
@@ -128,9 +126,9 @@ public class UserService {
         }
 
         friendStorage.addFriend(user, friend);
-        auditStorage.addEvent(userId, Events.FRIEND, Operations.ADD, friendId);
     }
 
+    @Auditable(eventName = Events.FRIEND, operationName = Operations.REMOVE, userId = "#userId", entityId = "#friendId")
     public void deleteFriend(Long userId, Long friendId) {
         final User user = userStorage.find(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + userId));
@@ -149,7 +147,6 @@ public class UserService {
         }
 
         friendStorage.removeFriend(user, friend);
-        auditStorage.addEvent(userId, Events.FRIEND, Operations.REMOVE, friendId);
     }
 
     public Collection<UserDto> findCommonFriends(Long userId, Long friendId) {
@@ -175,6 +172,7 @@ public class UserService {
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
     }
+
     public Collection<AuditDto> getFeed(Long userId) {
         if (userId < 1) {
             log.warn("Передан ID = {} меньше 1", userId);

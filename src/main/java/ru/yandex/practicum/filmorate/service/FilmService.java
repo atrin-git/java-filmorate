@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.aspects.Auditable;
 import ru.yandex.practicum.filmorate.dal.DirectorsFilmsDbStorage;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.NewFilmRequest;
@@ -17,6 +18,7 @@ import ru.yandex.practicum.filmorate.model.Operations;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.validation.FilmValidator;
 import ru.yandex.practicum.filmorate.storage.*;
+
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
@@ -43,9 +45,6 @@ public class FilmService {
     @Autowired
     @Qualifier("db-directorsFilms")
     private DirectorsFilmsDbStorage directorsFilmsDbStorage;
-    @Autowired
-    @Qualifier("db-audit")
-    private AuditStorage auditStorage;
     @Autowired
     private FilmValidator filmValidator;
 
@@ -112,15 +111,17 @@ public class FilmService {
     public void delete(Long filmId) {
         if (filmId == null || filmId < 1)
             throw new ValidationException("Указан некорректный id пользователя");
+
         filmStorage.find(filmId)
-                        .orElseThrow(() -> {
-                            log.warn("Не найден фильм с ID = {}", filmId);
-                            return new NotFoundException("Фильм не найден с ID: "  + filmId);
-                        });
+                .orElseThrow(() -> {
+                    log.warn("Не найден фильм с ID = {}", filmId);
+                    return new NotFoundException("Фильм не найден с ID: " + filmId);
+                });
 
         filmStorage.delete(filmId);
     }
 
+    @Auditable(eventName = Events.LIKE, operationName = Operations.ADD, userId = "#userId", entityId = "#filmId")
     public void addLike(Long filmId, Long userId) {
         final Film film = filmStorage.find(filmId)
                 .orElseThrow(() -> {
@@ -138,9 +139,9 @@ public class FilmService {
         likes.add(userId);
         film.setLikesByUsers(likes);
         likeStorage.addLikeOnFilm(filmId, userId);
-        auditStorage.addEvent(userId, Events.LIKE, Operations.ADD, filmId);
     }
 
+    @Auditable(eventName = Events.LIKE, operationName = Operations.REMOVE, userId = "#userId", entityId = "#filmId")
     public void deleteLike(Long filmId, Long userId) {
         final Film film = filmStorage.find(filmId)
                 .orElseThrow(() -> {
@@ -158,7 +159,6 @@ public class FilmService {
         likes.remove(userId);
         film.setLikesByUsers(likes);
         likeStorage.removeLikeOnFilm(filmId, userId);
-        auditStorage.addEvent(userId, Events.LIKE, Operations.REMOVE, filmId);
     }
 
     public Collection<FilmDto> getPopularFilms(Long count, Long genreId, Long year) {
@@ -172,7 +172,7 @@ public class FilmService {
             filmStream = filmStream.filter(film -> film.getReleaseDate().getYear() == year);
         }
         return filmStream.sorted((film1, film2) -> Integer.compare(film2.getLikesByUsers()
-                .size(), film1.getLikesByUsers().size()))
+                        .size(), film1.getLikesByUsers().size()))
                 .limit(count)
                 .map(FilmMapper::mapToFilmDto)
                 .toList();

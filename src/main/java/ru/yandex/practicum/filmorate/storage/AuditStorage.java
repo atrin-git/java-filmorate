@@ -2,11 +2,9 @@ package ru.yandex.practicum.filmorate.storage;
 
 import ru.yandex.practicum.filmorate.model.Audit;
 import ru.yandex.practicum.filmorate.model.Events;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Operations;
 
 import java.util.Collection;
-import java.util.Optional;
 
 public interface AuditStorage {
     void addEvent(Long userId, Events event, Operations operation, Long entityId);

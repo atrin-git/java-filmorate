@@ -5,11 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.dto.AuditDto;
-import ru.yandex.practicum.filmorate.dto.FilmDto;
-import ru.yandex.practicum.filmorate.dto.NewUserRequest;
-import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
-import ru.yandex.practicum.filmorate.dto.UserDto;
+import ru.yandex.practicum.filmorate.dto.*;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
@@ -85,6 +81,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/feed")
+    @ResponseStatus(HttpStatus.OK)
     public Collection<AuditDto> getFeed(@PathVariable("id") @NotNull Long userId) {
         log.info("Получен запрос на ленту событий пользователя с ID = {}", userId);
         return userService.getFeed(userId);
