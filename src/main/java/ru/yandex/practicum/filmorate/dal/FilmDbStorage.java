@@ -7,13 +7,13 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Likes;
 import ru.yandex.practicum.filmorate.storage.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
 
 @Slf4j
 @Component("db-films")
@@ -81,6 +81,22 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                          SELECT film_id
                          FROM likes_on_films
                          WHERE user_id = ?)""";
+    public static final String GET_FILMS_BY_TITLE_QUERY = """
+            SELECT *
+            FROM films
+            WHERE name LIKE ?""";
+    public static final String GET_FILMS_BY_DIRECTOR_QUERY = """
+            SELECT f.*
+            FROM films f
+            JOIN directors_on_films df ON f.id=df.film_id
+            JOIN directors d ON df.director_id=d.id
+            WHERE d.name LIKE ?""";
+    public static final String GET_FILMS_BY_TITLE_AND_DIRECTOR_QUERY = """
+            SELECT *
+            FROM films f
+                     LEFT JOIN directors_on_films df ON f.id=df.film_id
+                     LEFT JOIN directors d ON df.director_id=d.id
+            WHERE f.name LIKE ? OR d.name LIKE ?""";
 
     public FilmDbStorage(JdbcTemplate jdbc, RowMapper<Film> mapper) {
         super(jdbc, mapper);
@@ -185,6 +201,25 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
         films.forEach(this::addGenresAndLikes);
 
         return films;
+    }
+
+
+    public Collection<Film> searchFilmsByDirectorOrTitle(String substring, String by) {
+        substring = "%" + substring + "%";
+
+        return switch (by) {
+            case "title" -> findMany(GET_FILMS_BY_TITLE_QUERY, substring).stream()
+                    .peek(this::addGenresAndLikes)
+                    .toList();
+            case "director" -> findMany(GET_FILMS_BY_DIRECTOR_QUERY, substring).stream()
+                    .peek(this::addGenresAndLikes)
+                    .toList();
+            case "title,director", "director,title" ->
+                    findMany(GET_FILMS_BY_TITLE_AND_DIRECTOR_QUERY, substring, substring).stream()
+                            .peek(this::addGenresAndLikes)
+                            .toList();
+            default -> throw new InternalServerException("Переданы неверные значения параметра by = " + by);
+        };
     }
 
     public void addGenresAndLikes(Film film) {
