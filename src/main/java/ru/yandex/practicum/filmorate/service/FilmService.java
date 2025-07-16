@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.aspects.Auditable;
 import ru.yandex.practicum.filmorate.dal.DirectorsFilmsDbStorage;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.NewFilmRequest;
@@ -11,7 +12,9 @@ import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.dto.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Events;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Operations;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.validation.FilmValidator;
 import ru.yandex.practicum.filmorate.storage.*;
@@ -108,6 +111,7 @@ public class FilmService {
     public void delete(Long filmId) {
         if (filmId == null || filmId < 1)
             throw new ValidationException("Указан некорректный id пользователя");
+
         filmStorage.find(filmId)
                 .orElseThrow(() -> {
                     log.warn("Не найден фильм с ID = {}", filmId);
@@ -117,6 +121,7 @@ public class FilmService {
         filmStorage.delete(filmId);
     }
 
+    @Auditable(eventName = Events.LIKE, operationName = Operations.ADD, userId = "#userId", entityId = "#filmId")
     public void addLike(Long filmId, Long userId) {
         final Film film = filmStorage.find(filmId)
                 .orElseThrow(() -> {
@@ -136,6 +141,7 @@ public class FilmService {
         likeStorage.addLikeOnFilm(filmId, userId);
     }
 
+    @Auditable(eventName = Events.LIKE, operationName = Operations.REMOVE, userId = "#userId", entityId = "#filmId")
     public void deleteLike(Long filmId, Long userId) {
         final Film film = filmStorage.find(filmId)
                 .orElseThrow(() -> {

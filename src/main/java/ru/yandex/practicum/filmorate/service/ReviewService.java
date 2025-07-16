@@ -5,8 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.aspects.Auditable;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Events;
+import ru.yandex.practicum.filmorate.model.Operations;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.ReviewRatingStorage;
@@ -16,7 +19,7 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 import java.util.Collection;
 
 @Slf4j
-@Service
+@Service("reviewService")
 @RequiredArgsConstructor
 public class ReviewService {
 
@@ -39,6 +42,7 @@ public class ReviewService {
                 });
     }
 
+    @Auditable(eventName = Events.REVIEW, operationName = Operations.ADD, userId = "#review.userId", entityId = "#review.id")
     public Review create(Review review) {
         checkUserId(review.getUserId());
         checkFilmId(review.getFilmId());
@@ -46,6 +50,7 @@ public class ReviewService {
         return reviewStorage.create(review);
     }
 
+    @Auditable(eventName = Events.REVIEW, operationName = Operations.UPDATE, userId = "#updateReview.userId", entityId = "#updateReview.id")
     public Review update(Review updateReview) {
         checkReviewId(updateReview.getId());
         checkUserId(updateReview.getUserId());
@@ -54,6 +59,7 @@ public class ReviewService {
         return reviewStorage.update(updateReview);
     }
 
+    @Auditable(eventName = Events.REVIEW, operationName = Operations.REMOVE, userId = "@reviewService.find(#reviewId).userId", entityId = "#reviewId", isDeleting = "true")
     public void delete(Long reviewId) {
         checkReviewId(reviewId);
 

@@ -1,13 +1,11 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.dto.FilmDto;
-import ru.yandex.practicum.filmorate.dto.NewUserRequest;
-import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
-import ru.yandex.practicum.filmorate.dto.UserDto;
+import ru.yandex.practicum.filmorate.dto.*;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
@@ -81,6 +79,14 @@ public class UserController {
         log.info("Получен запрос за нахождение общих друзей у {} и {}", userId, friendId);
         return userService.findCommonFriends(userId, friendId);
     }
+
+    @GetMapping("/{id}/feed")
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<AuditDto> getFeed(@PathVariable("id") @NotNull Long userId) {
+        log.info("Получен запрос на ленту событий пользователя с ID = {}", userId);
+        return userService.getFeed(userId);
+    }
+
 
     @GetMapping("{id}/recommendations")
     public Collection<FilmDto> getRecommendations(@PathVariable("id") Long userId) {

@@ -4,18 +4,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dto.FilmDto;
-import ru.yandex.practicum.filmorate.dto.NewUserRequest;
-import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
-import ru.yandex.practicum.filmorate.dto.UserDto;
+import ru.yandex.practicum.filmorate.aspects.Auditable;
+import ru.yandex.practicum.filmorate.dto.*;
+import ru.yandex.practicum.filmorate.dto.mappers.AuditMapper;
 import ru.yandex.practicum.filmorate.dto.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.dto.mappers.UserMapper;
 import ru.yandex.practicum.filmorate.exception.DuplicateException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Events;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Operations;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.validation.UserValidator;
+import ru.yandex.practicum.filmorate.storage.AuditStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.FriendsStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -37,6 +39,9 @@ public class UserService {
     @Autowired
     @Qualifier("db-friends")
     private FriendsStorage friendStorage;
+    @Autowired
+    @Qualifier("db-audit")
+    private AuditStorage auditStorage;
     @Autowired
     private UserValidator userValidator;
 
@@ -102,6 +107,7 @@ public class UserService {
                 .toList();
     }
 
+    @Auditable(eventName = Events.FRIEND, operationName = Operations.ADD, userId = "#userId", entityId = "#friendId")
     public void addFriend(Long userId, Long friendId) {
         final User user = userStorage.find(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + userId));
@@ -122,6 +128,7 @@ public class UserService {
         friendStorage.addFriend(user, friend);
     }
 
+    @Auditable(eventName = Events.FRIEND, operationName = Operations.REMOVE, userId = "#userId", entityId = "#friendId")
     public void deleteFriend(Long userId, Long friendId) {
         final User user = userStorage.find(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + userId));
@@ -165,4 +172,16 @@ public class UserService {
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
     }
+
+    public Collection<AuditDto> getFeed(Long userId) {
+        if (userId < 1) {
+            log.warn("Передан ID = {} меньше 1", userId);
+            throw new ValidationException("Идентификатор пользователя не может быть менее 1.");
+        }
+
+        return auditStorage.getEventsForUser(userId).stream()
+                .map(AuditMapper::mapToAuditDto)
+                .toList();
+    }
+
 }
