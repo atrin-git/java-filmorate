@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.aspects.Auditable;
+import ru.yandex.practicum.filmorate.dto.mappers.ReviewMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Events;
@@ -46,17 +47,19 @@ public class ReviewService {
     public Review create(Review review) {
         checkUserId(review.getUserId());
         checkFilmId(review.getFilmId());
+        checkContent(review.getContent());
+        checkIsPositive(review.getIsPositive());
 
         return reviewStorage.create(review);
     }
 
-    @Auditable(eventName = Events.REVIEW, operationName = Operations.UPDATE, userId = "#updateReview.userId", entityId = "#updateReview.id")
+    @Auditable(eventName = Events.REVIEW, operationName = Operations.UPDATE, userId = "@reviewService.find(#updateReview.id).userId", entityId = "@reviewService.find(#updateReview.id).id", isDeleting = "true")
     public Review update(Review updateReview) {
         checkReviewId(updateReview.getId());
-        checkUserId(updateReview.getUserId());
-        checkFilmId(updateReview.getFilmId());
 
-        return reviewStorage.update(updateReview);
+        Review review = find(updateReview.getId());
+        review = ReviewMapper.updateReviewFields(review, updateReview);
+        return reviewStorage.update(review);
     }
 
     @Auditable(eventName = Events.REVIEW, operationName = Operations.REMOVE, userId = "@reviewService.find(#reviewId).userId", entityId = "#reviewId", isDeleting = "true")
@@ -112,5 +115,19 @@ public class ReviewService {
                 .orElseThrow(() -> {
                     throw new NotFoundException("Пользователь не найден с id: " + reviewId);
                 });
+    }
+
+    private void checkContent(String content) {
+        if (content == null || content.trim().isEmpty()) {
+            log.debug("Передано значение content = {}. Валидация не пройдена", content);
+            throw new ValidationException("Содержание отзыва не может быть пустым");
+        }
+    }
+
+    private void checkIsPositive(Boolean isPositive) {
+        if (isPositive == null) {
+            log.debug("Передано значение is_positive = null. Валидация не пройдена");
+            throw new ValidationException("Поле isPositive обязательное");
+        }
     }
 }

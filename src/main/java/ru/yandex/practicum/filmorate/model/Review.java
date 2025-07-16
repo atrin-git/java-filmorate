@@ -15,4 +15,15 @@ public class Review {
     private String content;
     private long useful;
 
+    public boolean hasIsPositive() {
+        return isPositive != null;
+    }
+
+    public boolean hasContent() {
+        return content != null;
+    }
+
+    public boolean hasUseful() {
+        return content != null;
+    }
 }

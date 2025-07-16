@@ -84,19 +84,19 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
     public static final String GET_FILMS_BY_TITLE_QUERY = """
             SELECT *
             FROM films
-            WHERE name LIKE ?""";
+            WHERE LOWER(name) LIKE ?""";
     public static final String GET_FILMS_BY_DIRECTOR_QUERY = """
             SELECT f.*
             FROM films f
             JOIN directors_on_films df ON f.id=df.film_id
             JOIN directors d ON df.director_id=d.id
-            WHERE d.name LIKE ?""";
+            WHERE LOWER(d.name) LIKE ?""";
     public static final String GET_FILMS_BY_TITLE_AND_DIRECTOR_QUERY = """
             SELECT *
             FROM films f
                      LEFT JOIN directors_on_films df ON f.id=df.film_id
                      LEFT JOIN directors d ON df.director_id=d.id
-            WHERE f.name LIKE ? OR d.name LIKE ?""";
+            WHERE LOWER(f.name) LIKE ? OR LOWER(d.name) LIKE ?""";
 
     public FilmDbStorage(JdbcTemplate jdbc, RowMapper<Film> mapper) {
         super(jdbc, mapper);
@@ -153,6 +153,11 @@ public class FilmDbStorage extends BaseDbStorage<Film> implements FilmStorage {
                 film.getRating().getId(),
                 film.getId()
         );
+        if (film.getGenres() != null) {
+            genresStorage.setGenresForFilm(film.getId(), film.getGenres());
+        } else {
+            film.setGenres(Set.of());
+        }
         if (film.getDirectors() != null) {
             directorsFilmsStorage.setDirectorsForFilm(film.getId(), film.getDirectors());
         } else {

@@ -37,15 +37,18 @@ public class AuditAspect {
             context.setVariable(paramNames[i], args[i]);
         }
 
-        Long userId = null;
+        Long userId = null, entityId = null;
         if (Boolean.parseBoolean(auditAnnotation.isDeleting())) {
             userId = evaluateIds(auditAnnotation.userId(), context);
+            entityId = evaluateIds(auditAnnotation.entityId(), context);
         }
 
         Object result = joinPoint.proceed();
         context.setVariable("result", result);
 
-        Long entityId = evaluateIds(auditAnnotation.entityId(), context);
+        if (entityId == null) {
+            entityId = evaluateIds(auditAnnotation.entityId(), context);
+        }
         if (userId == null) {
             userId = evaluateIds(auditAnnotation.userId(), context);
         }

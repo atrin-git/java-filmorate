@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
 
-import java.util.Collection;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -11,7 +10,10 @@ import ru.yandex.practicum.filmorate.dto.UpdateDirectorRequest;
 import ru.yandex.practicum.filmorate.dto.mappers.DirectorMapper;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.model.validation.DirectorValidator;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
+
+import java.util.Collection;
 
 @Slf4j
 @Service
@@ -19,6 +21,8 @@ public class DirectorService {
     @Autowired
     @Qualifier("db-directors")
     private DirectorStorage directorStorage;
+    @Autowired
+    private DirectorValidator directorValidator;
 
     public Collection<DirectorDto> findAll() {
         return directorStorage.findAll().stream().map(DirectorMapper::mapToDirectorDto).toList();
@@ -30,23 +34,25 @@ public class DirectorService {
         });
     }
 
-    public DirectorDto create(NewDirectorRequest director) {
-        Director result = DirectorMapper.mapToDirector(director);
-        this.directorStorage.create(result);
-        return DirectorMapper.mapToDirectorDto(result);
+    public DirectorDto create(NewDirectorRequest newDirector) {
+        Director director = DirectorMapper.mapToDirector(newDirector);
+        directorValidator.checkDirectorIsValid(director);
+        this.directorStorage.create(director);
+        return DirectorMapper.mapToDirectorDto(director);
     }
 
-    public DirectorDto update(UpdateDirectorRequest director) {
-        Director result = DirectorMapper.mapToDirector(director);
+    public DirectorDto update(UpdateDirectorRequest updateDirector) {
+        Director director = DirectorMapper.mapToDirector(updateDirector);
+        directorValidator.checkDirectorIsValid(director);
 
-        if (!director.hasName()) {
-            return DirectorMapper.mapToDirectorDto(result);
+        if (!updateDirector.hasName()) {
+            return DirectorMapper.mapToDirectorDto(director);
         } else {
-            directorStorage.find(director.getId()).orElseThrow(() -> {
-                log.warn("Не найден режиссер с ID = {}", director.getId());
-                return new NotFoundException("режиссер не найден с ID: " + director.getId());
+            directorStorage.find(updateDirector.getId()).orElseThrow(() -> {
+                log.warn("Не найден режиссер с ID = {}", updateDirector.getId());
+                return new NotFoundException("режиссер не найден с ID: " + updateDirector.getId());
             });
-            return DirectorMapper.mapToDirectorDto(directorStorage.update(result));
+            return DirectorMapper.mapToDirectorDto(directorStorage.update(director));
         }
     }
 

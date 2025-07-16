@@ -179,6 +179,8 @@ public class UserService {
             throw new ValidationException("Идентификатор пользователя не может быть менее 1.");
         }
 
+        find(userId);
+
         return auditStorage.getEventsForUser(userId).stream()
                 .map(AuditMapper::mapToAuditDto)
                 .toList();

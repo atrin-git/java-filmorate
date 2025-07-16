@@ -32,7 +32,7 @@ public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStor
     private static final String INSERT_QUERY = "INSERT INTO reviews(film_id, user_id, isPositive, content)" +
             "VALUES(?, ?, ?, ?)";
     private static final String UPDATE_QUERY = "UPDATE reviews SET " +
-            "film_id = ?, user_id = ?, isPositive = ?, content = ? WHERE id = ?";
+            "isPositive = ?, content = ? WHERE id = ?";
     private static final String DELETE_QUERY = "DELETE FROM reviews WHERE id = ?";
     private static final String FIND_LIMITED_REVIEWS_QUERY = """
             SELECT r.id, r.film_id, r.user_id, r.isPositive, r.content,
@@ -95,8 +95,6 @@ public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStor
     public Review update(Review review) {
         update(
                 UPDATE_QUERY,
-                review.getFilmId(),
-                review.getUserId(),
                 review.getIsPositive(),
                 review.getContent(),
                 review.getId()

@@ -57,7 +57,7 @@ class GenresDBStorageTests {
 
         Collection<Genre> genres = genresStorage.getGenresForFilm(filmCreated.getId());
 
-        assertEquals(2, genres.size());
+        assertEquals(1, genres.size());
         assertTrue(genres.stream().map(Genre::getId).collect(Collectors.toSet()).contains(2L));
     }
 

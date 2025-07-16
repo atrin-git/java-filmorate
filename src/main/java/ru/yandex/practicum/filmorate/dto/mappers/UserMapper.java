@@ -11,7 +11,7 @@ import ru.yandex.practicum.filmorate.model.User;
 public final class UserMapper {
     public static User mapToUser(NewUserRequest request) {
         return User.builder()
-                .name(request.getName())
+                .name((request.getName() != null && !request.getName().isEmpty()) ? request.getName() : request.getLogin())
                 .login(request.getLogin())
                 .email(request.getEmail())
                 .password(request.getPassword())

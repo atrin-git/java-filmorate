@@ -20,6 +20,7 @@ import ru.yandex.practicum.filmorate.model.validation.FilmValidator;
 import ru.yandex.practicum.filmorate.storage.*;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -192,16 +193,28 @@ public class FilmService {
                 .peek(filmStorage::addGenresAndLikes)
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
-        if ("year".equals(sortBy)) {
-            return result;
+        if (result.isEmpty()) {
+            log.warn("Не найдено фильмов с режиссёром {}", directorId);
+            throw new NotFoundException("Не найдено фильмов с режиссёром ID = " + directorId);
         }
-        return result.stream().sorted((f1, f2) -> f2.getLikesByUsers().size() - f1.getLikesByUsers().size())
-                .toList();
+        switch (sortBy) {
+            case "year" -> {
+                return result.stream().sorted(Comparator.comparing(FilmDto::getReleaseDate))
+                        .toList();
+            }
+            case "likes" -> {
+                return result.stream().sorted((f1, f2) -> f2.getLikesByUsers().size() - f1.getLikesByUsers().size())
+                        .toList();
+            }
+            default -> {
+                return null;
+            }
+        }
     }
 
     public Collection<FilmDto> searchFilmsByDirectorOrTitle(String substring, String by) {
 
-        Collection<Film> films = filmStorage.searchFilmsByDirectorOrTitle(substring, by);
+        Collection<Film> films = filmStorage.searchFilmsByDirectorOrTitle(substring.toLowerCase(), by);
 
         return films.stream()
                 .sorted((f1, f2) -> f2.getLikesByUsers().size() - f1.getLikesByUsers().size())

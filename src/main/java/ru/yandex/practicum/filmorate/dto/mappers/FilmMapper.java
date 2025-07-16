@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -80,9 +81,13 @@ public final class FilmMapper {
         }
         if (request.hasGenres()) {
             film.setGenres(request.getGenres());
+        } else {
+            film.setGenres(Set.of());
         }
         if (request.hasDirectors()) {
             film.setDirectors(request.getDirectors());
+        } else {
+            film.setDirectors(Set.of());
         }
         return film;
     }
