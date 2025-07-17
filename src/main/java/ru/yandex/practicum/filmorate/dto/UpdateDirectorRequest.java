@@ -8,9 +8,5 @@ import lombok.Data;
 public class UpdateDirectorRequest extends BaseDirectorRequest {
     private Long id;
     private String name;
-
-    public boolean hasName() {
-        return this.name != null && !this.name.isBlank();
-    }
 }
 

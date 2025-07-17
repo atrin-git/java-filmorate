@@ -1,10 +1,8 @@
 package ru.yandex.practicum.filmorate.advices;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Setter
-@Getter
+@Data
 public class ErrorResponseTemplate {
 
     private String error;
