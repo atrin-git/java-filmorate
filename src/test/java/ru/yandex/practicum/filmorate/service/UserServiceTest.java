@@ -30,7 +30,7 @@ public class UserServiceTest {
     private User user3;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         user1 = User.builder()
                 .id(1L)
                 .email("user1@yandex.ru")
@@ -58,7 +58,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void testDeleteUser_ById() {
+    public void testDeleteUser_ById() {
         when(userStorage.find(1L)).thenReturn(Optional.of(user1));
         doNothing().when(userStorage).delete(1L);
         userService.delete(1L);
@@ -67,7 +67,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void testDeleteUser_ById_ShouldThrownNotFoundException() {
+    public void testDeleteUser_ById_ShouldThrownNotFoundException() {
         when(userStorage.find(1L)).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class,  () -> userService.delete(1L));
@@ -75,11 +75,10 @@ public class UserServiceTest {
     }
 
     @Test
-    void testGetUser_ById() {
+    public void testGetUser_ById() {
         when(userStorage.find(1L)).thenReturn(Optional.of(user1));
         UserDto user1Dto = UserMapper.mapToUserDto(user1);
 
         assertEquals(user1Dto, userService.find(1L));
     }
-
 }
