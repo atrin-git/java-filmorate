@@ -49,7 +49,7 @@ public class AuditAspectTests {
     private Review review;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         user = GenerateTestData.generateNewUser(List.of(1L));
         friend = GenerateTestData.generateNewUser(List.of(2L));
         film = GenerateTestData.generateNewFilm(List.of(1L));
@@ -69,7 +69,7 @@ public class AuditAspectTests {
     }
 
     @Test
-    void checkAddNewEvent_FriendAdd() {
+    public void checkAddNewEvent_FriendAdd() {
         userService.addFriend(user.getId(), friend.getId());
 
         verify(auditDbStorage, times(1))
@@ -82,7 +82,7 @@ public class AuditAspectTests {
     }
 
     @Test
-    void checkAddNewEvent_FriendRemove() {
+    public void checkAddNewEvent_FriendRemove() {
         userService.addFriend(user.getId(), friend.getId());
         userService.deleteFriend(user.getId(), friend.getId());
 
@@ -96,7 +96,7 @@ public class AuditAspectTests {
     }
 
     @Test
-    void checkAddNewEvent_LikeAdd() {
+    public void checkAddNewEvent_LikeAdd() {
         filmService.addLike(film.getId(), user.getId());
 
         verify(auditDbStorage, times(1))
@@ -109,7 +109,7 @@ public class AuditAspectTests {
     }
 
     @Test
-    void checkAddNewEvent_LikeRemove() {
+    public void checkAddNewEvent_LikeRemove() {
         filmService.addLike(film.getId(), user.getId());
         filmService.deleteLike(film.getId(), user.getId());
 
@@ -123,7 +123,7 @@ public class AuditAspectTests {
     }
 
     @Test
-    void checkAddNewEvent_ReviewAdd() {
+    public void checkAddNewEvent_ReviewAdd() {
         reviewService.create(review);
 
         verify(auditDbStorage, times(1))
@@ -136,7 +136,7 @@ public class AuditAspectTests {
     }
 
     @Test
-    void checkAddNewEvent_ReviewUpdate() {
+    public void checkAddNewEvent_ReviewUpdate() {
         reviewService.update(review);
 
         verify(auditDbStorage, times(1))
@@ -149,7 +149,7 @@ public class AuditAspectTests {
     }
 
     @Test
-    void checkAddNewEvent_ReviewRemove() {
+    public void checkAddNewEvent_ReviewRemove() {
         reviewService.delete(review.getId());
 
         verify(auditDbStorage, times(1))

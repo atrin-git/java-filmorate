@@ -33,7 +33,7 @@ class FilmServiceTest {
     private Film film3;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         film1 = Film.builder()
                 .id(1L)
                 .name("Фильм 1")
@@ -60,7 +60,7 @@ class FilmServiceTest {
     }
 
     @Test
-    void testGetPopularFilms_AllFilms() {
+    public void testGetPopularFilms_AllFilms() {
         when(filmStorage.getAll()).thenReturn(List.of(film1, film2, film3));
         Collection<FilmDto> result = filmService.getPopularFilms(3L, null, null);
 
@@ -69,7 +69,7 @@ class FilmServiceTest {
     }
 
     @Test
-    void testGetPopularFilms_ByGenre() {
+    public void testGetPopularFilms_ByGenre() {
         when(filmStorage.getAll()).thenReturn(List.of(film1, film3));
         Collection<FilmDto> result = filmService.getPopularFilms(2L, 1L, null);
 
@@ -82,7 +82,7 @@ class FilmServiceTest {
     }
 
     @Test
-    void testGetPopularFilms_ByYear() {
+    public void testGetPopularFilms_ByYear() {
         when(filmStorage.getAll()).thenReturn(List.of(film1, film2));
         Collection<FilmDto> result = filmService.getPopularFilms(2L, null, 2023L);
 
@@ -91,7 +91,7 @@ class FilmServiceTest {
     }
 
     @Test
-    void testGetPopularFilms_ByGenreAndYear() {
+    public void testGetPopularFilms_ByGenreAndYear() {
         when(filmStorage.getAll()).thenReturn(List.of(film1, film3));
         Collection<FilmDto> result = filmService.getPopularFilms(2L, 1L, 2023L);
 
@@ -100,7 +100,7 @@ class FilmServiceTest {
     }
 
     @Test
-    void testGetPopularFilms_Limit() {
+    public void testGetPopularFilms_Limit() {
         when(filmStorage.getAll()).thenReturn(List.of(film1, film2, film3));
         Collection<FilmDto> result = filmService.getPopularFilms(2L, null, null);
 
@@ -108,7 +108,7 @@ class FilmServiceTest {
     }
 
     @Test
-    void testDeleteFilm_ById() {
+    public void testDeleteFilm_ById() {
         when(filmStorage.find(1L)).thenReturn(Optional.of(film1));
         doNothing().when(filmStorage).delete(1L);
         filmService.delete(1L);
@@ -117,7 +117,7 @@ class FilmServiceTest {
     }
 
     @Test
-    void testDeleteFilm_ById_ShouldThrownNotFoundException() {
+    public void testDeleteFilm_ById_ShouldThrownNotFoundException() {
         when(filmStorage.find(1L)).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> filmService.delete(1L));

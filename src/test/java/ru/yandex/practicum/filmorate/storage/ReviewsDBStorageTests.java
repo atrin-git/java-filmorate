@@ -68,7 +68,7 @@ public class ReviewsDBStorageTests {
     }
 
     @Test
-    void testCreateReview() {
+    public void testCreateReview() {
         Review createdReview = reviewStorage.create(review1);
 
         assertNotNull(createdReview.getId(), "ID отзыва не должен быть null");
@@ -78,7 +78,7 @@ public class ReviewsDBStorageTests {
     }
 
     @Test
-    void testUpdateReview() {
+    public void testUpdateReview() {
         Review createdReview = reviewStorage.create(review1);
         Review updatedReview = Review.builder()
                 .id(createdReview.getId())
@@ -97,7 +97,7 @@ public class ReviewsDBStorageTests {
     }
 
     @Test
-    void testFindLimitedReviews_ById() {
+    public void testFindLimitedReviews_ById() {
         User user2 = userStorage.create(
                 User.builder()
                         .id(2L)
@@ -125,7 +125,7 @@ public class ReviewsDBStorageTests {
     }
 
     @Test
-    void testAddLikeOnReview() {
+    public void testAddLikeOnReview() {
         review1 = reviewStorage.create(review1);
         reviewRatingStorage.addRatingOnReview(user1.getId(), review1.getId(), true);
 
@@ -133,7 +133,7 @@ public class ReviewsDBStorageTests {
     }
 
     @Test
-    void testDeleteLikeOnReview() {
+    public void testDeleteLikeOnReview() {
         review1 = reviewStorage.create(review1);
         reviewRatingStorage.addRatingOnReview(user1.getId(), review1.getId(), true);
         reviewRatingStorage.removeRatingOnReview(review1.getId(), user1.getId());
@@ -142,7 +142,7 @@ public class ReviewsDBStorageTests {
     }
 
     @Test
-    void testAddDislikeOnReview() {
+    public void testAddDislikeOnReview() {
         review1 = reviewStorage.create(review1);
         reviewRatingStorage.addRatingOnReview(user1.getId(), review1.getId(), false);
 
@@ -150,7 +150,7 @@ public class ReviewsDBStorageTests {
     }
 
     @Test
-    void testDeleteDislikeOnReview() {
+    public void testDeleteDislikeOnReview() {
         review1 = reviewStorage.create(review1);
         reviewRatingStorage.addRatingOnReview(user1.getId(), review1.getId(), false);
         reviewRatingStorage.removeRatingOnReview(review1.getId(), user1.getId());

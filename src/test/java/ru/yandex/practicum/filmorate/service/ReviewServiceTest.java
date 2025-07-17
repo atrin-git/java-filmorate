@@ -34,7 +34,7 @@ public class ReviewServiceTest {
     private Review review3;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         review1 = review1.builder()
                 .id(1L)
                 .filmId(5L)
@@ -62,7 +62,7 @@ public class ReviewServiceTest {
     }
 
     @Test
-    void testGetReview_ById() {
+    public void testGetReview_ById() {
         when(reviewStorage.find(1L)).thenReturn(Optional.of(review1));
 
         Review result = reviewService.find(1L);
@@ -71,7 +71,7 @@ public class ReviewServiceTest {
     }
 
     @Test
-    void testGetReview_ById_ShouldThrownNotFoundException() {
+    public void testGetReview_ById_ShouldThrownNotFoundException() {
         when(reviewStorage.find(1L)).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> reviewService.find(1L));
@@ -79,7 +79,7 @@ public class ReviewServiceTest {
     }
 
     @Test
-    void testDeleteReview_ById() {
+    public void testDeleteReview_ById() {
         when(reviewStorage.find(1L)).thenReturn(Optional.of(review1));
         doNothing().when(reviewStorage).delete(1L);
 
@@ -88,7 +88,7 @@ public class ReviewServiceTest {
     }
 
     @Test
-    void testDeleteReview_ById_ShouldThrownNotFoundException() {
+    public void testDeleteReview_ById_ShouldThrownNotFoundException() {
         when(reviewStorage.find(1L)).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> reviewService.delete(1L));
