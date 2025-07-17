@@ -48,15 +48,14 @@ public class DirectorController {
     }
 
     @GetMapping({"/{id}"})
-    public Director find(@PathVariable Long id) {
+    public DirectorDto find(@PathVariable Long id) {
         log.info("Получен запрос на получение режиссера {}", id);
         return directorService.find(id);
     }
 
     @DeleteMapping({"/{id}"})
-    public ResponseEntity<?> delete(@PathVariable Long id) {
+    public void delete(@PathVariable Long id) {
         log.info("Получен запрос за удаление режиссера {}", id);
         directorService.delete(id);
-        return ResponseEntity.ok().build();
     }
 }

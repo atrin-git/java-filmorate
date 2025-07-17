@@ -28,36 +28,30 @@ public class DirectorService {
         return directorStorage.findAll().stream().map(DirectorMapper::mapToDirectorDto).toList();
     }
 
-    public Director find(Long id) {
-        return directorStorage.find(id).orElseThrow(() -> {
-            return new NotFoundException("Режиссер не найден с ID: " + id);
-        });
+    public DirectorDto find(Long id) {
+        Director result = directorStorage.find(id).orElseThrow(() -> new NotFoundException("Режиссер не найден с ID: " + id));
+        return DirectorMapper.mapToDirectorDto(result);
     }
 
     public DirectorDto create(NewDirectorRequest newDirector) {
         Director director = DirectorMapper.mapToDirector(newDirector);
         directorValidator.checkDirectorIsValid(director);
-        this.directorStorage.create(director);
+        directorStorage.create(director);
         return DirectorMapper.mapToDirectorDto(director);
     }
 
     public DirectorDto update(UpdateDirectorRequest updateDirector) {
         Director director = DirectorMapper.mapToDirector(updateDirector);
         directorValidator.checkDirectorIsValid(director);
-
-        if (!updateDirector.hasName()) {
-            return DirectorMapper.mapToDirectorDto(director);
-        } else {
-            directorStorage.find(updateDirector.getId()).orElseThrow(() -> {
-                log.warn("Не найден режиссер с ID = {}", updateDirector.getId());
-                return new NotFoundException("режиссер не найден с ID: " + updateDirector.getId());
-            });
-            return DirectorMapper.mapToDirectorDto(directorStorage.update(director));
-        }
+        directorStorage.find(updateDirector.getId()).orElseThrow(() -> {
+            log.warn("Не найден режиссер с ID = {}", updateDirector.getId());
+            return new NotFoundException("режиссер не найден с ID: " + updateDirector.getId());
+        });
+        return DirectorMapper.mapToDirectorDto(directorStorage.update(director));
     }
 
     public void delete(Long id) {
-        this.directorStorage.find(id).orElseThrow(() -> {
+        directorStorage.find(id).orElseThrow(() -> {
             log.warn("Не найден режиссер с ID = {}", id);
             return new NotFoundException("режиссер не найден с ID: " + id);
         });

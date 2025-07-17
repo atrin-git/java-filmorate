@@ -163,17 +163,11 @@ public class FilmService {
     }
 
     public Collection<FilmDto> getPopularFilms(Long count, Long genreId, Long year) {
-        Collection<Film> films = filmStorage.getAll();
-        Stream<Film> filmStream = films.stream();
-        if (genreId != null) {
-            filmStream = filmStream.filter(film -> film.getGenres().stream()
-                    .anyMatch(genre -> Objects.equals(genre.getId(), genreId)));
-        }
-        if (year != null) {
-            filmStream = filmStream.filter(film -> film.getReleaseDate().getYear() == year);
-        }
-        return filmStream.sorted((film1, film2) -> Integer.compare(film2.getLikesByUsers()
-                        .size(), film1.getLikesByUsers().size()))
+        return filmStorage.getAll().stream()
+                .filter(film -> (genreId == null || film.getGenres().stream()
+                        .anyMatch(genre -> Objects.equals(genre.getId(), genreId)))
+                        && (year == null || film.getReleaseDate().getYear() == year))
+                .sorted((film1, film2) -> Integer.compare(film2.getLikesByUsers().size(), film1.getLikesByUsers().size()))
                 .limit(count)
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
