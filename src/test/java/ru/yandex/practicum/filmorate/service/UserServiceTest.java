@@ -25,13 +25,11 @@ public class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
-    private User user1;
-    private User user2;
-    private User user3;
+    private User user;
 
     @BeforeEach
     public void setUp() {
-        user1 = User.builder()
+        user = User.builder()
                 .id(1L)
                 .email("user1@yandex.ru")
                 .login("ivan111")
@@ -39,28 +37,11 @@ public class UserServiceTest {
                 .password("qwerty1")
                 .birthday(LocalDate.of(1997, 1, 21))
                 .build();
-        user2 = User.builder()
-                .id(2L)
-                .email("user2@yandex.ru")
-                .login("ekaterina222")
-                .name("Екатерина")
-                .password("qwerty2")
-                .birthday(LocalDate.of(1985, 4, 5))
-                .build();
-        user3 = User.builder()
-                .id(3L)
-                .email("user3@yandex.ru")
-                .login("sergey333")
-                .name("Сергей")
-                .password("qwerty3")
-                .birthday(LocalDate.of(2003, 6, 25))
-                .build();
     }
 
     @Test
     public void testDeleteUser_ById() {
-        when(userStorage.find(1L)).thenReturn(Optional.of(user1));
-        doNothing().when(userStorage).delete(1L);
+        when(userStorage.find(1L)).thenReturn(Optional.of(user));
         userService.delete(1L);
 
         verify(userStorage).delete(1L);
@@ -76,8 +57,8 @@ public class UserServiceTest {
 
     @Test
     public void testGetUser_ById() {
-        when(userStorage.find(1L)).thenReturn(Optional.of(user1));
-        UserDto user1Dto = UserMapper.mapToUserDto(user1);
+        when(userStorage.find(1L)).thenReturn(Optional.of(user));
+        UserDto user1Dto = UserMapper.mapToUserDto(user);
 
         assertEquals(user1Dto, userService.find(1L));
     }

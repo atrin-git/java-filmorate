@@ -34,8 +34,9 @@ public class ReviewService {
     private UserStorage userStorage;
 
     public Review find(Long reviewId) {
-        if (reviewId == null)
+        if (reviewId == null) {
             throw new ValidationException("Некорректный Id отзыва");
+        }
 
         return reviewStorage.find(reviewId)
                 .orElseThrow(() -> {
@@ -47,8 +48,8 @@ public class ReviewService {
     public Review create(Review review) {
         checkUserId(review.getUserId());
         checkFilmId(review.getFilmId());
-        checkContent(review.getContent());
-        checkIsPositive(review.getIsPositive());
+        ReviewMapper.checkContent(review.getContent());
+        ReviewMapper.checkIsPositive(review.getIsPositive());
 
         return reviewStorage.create(review);
     }
@@ -88,8 +89,9 @@ public class ReviewService {
     }
 
     private void checkUserId(Long userId) {
-        if (userId == null)
+        if (userId == null) {
             throw new ValidationException("Некорректный Id пользователя");
+        }
 
         userStorage.find(userId)
                 .orElseThrow(() -> {
@@ -98,8 +100,9 @@ public class ReviewService {
     }
 
     private void checkFilmId(Long filmId) {
-        if (filmId == null)
+        if (filmId == null) {
             throw new ValidationException("Некорректный Id фильма");
+        }
 
         filmStorage.find(filmId)
                 .orElseThrow(() -> {
@@ -108,8 +111,9 @@ public class ReviewService {
     }
 
     private void checkReviewId(Long reviewId) {
-        if (reviewId == null)
+        if (reviewId == null) {
             throw new ValidationException("Некорректный Id отзыва");
+        }
 
         reviewStorage.find(reviewId)
                 .orElseThrow(() -> {
@@ -117,17 +121,4 @@ public class ReviewService {
                 });
     }
 
-    private void checkContent(String content) {
-        if (content == null || content.trim().isEmpty()) {
-            log.debug("Передано значение content = {}. Валидация не пройдена", content);
-            throw new ValidationException("Содержание отзыва не может быть пустым");
-        }
-    }
-
-    private void checkIsPositive(Boolean isPositive) {
-        if (isPositive == null) {
-            log.debug("Передано значение is_positive = null. Валидация не пройдена");
-            throw new ValidationException("Поле isPositive обязательное");
-        }
-    }
 }

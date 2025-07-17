@@ -113,9 +113,10 @@ public class ReviewDbStorage extends BaseDbStorage<Review> implements ReviewStor
 
     @Override
     public Collection<Review> findLimitedReviews(Long filmId, Long count) {
-        if (filmId == null)
+        if (filmId == null) {
             return findMany(FIND_LIMITED_REVIEWS_QUERY, count);
-        else
-            return findMany(FIND_LIMITED_REVIEWS_BY_FILM_ID_QUERY, filmId, count);
+        }
+
+        return findMany(FIND_LIMITED_REVIEWS_BY_FILM_ID_QUERY, filmId, count);
     }
 }
