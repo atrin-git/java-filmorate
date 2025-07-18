@@ -6,14 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
-import ru.yandex.practicum.filmorate.dal.FilmDbStorage;
-import ru.yandex.practicum.filmorate.dal.GenresDbStorage;
-import ru.yandex.practicum.filmorate.dal.LikesDbStorage;
-import ru.yandex.practicum.filmorate.dal.RatesDbStorage;
-import ru.yandex.practicum.filmorate.dal.mappers.FilmRowMapper;
-import ru.yandex.practicum.filmorate.dal.mappers.GenresRowMapper;
-import ru.yandex.practicum.filmorate.dal.mappers.LikesRowMapper;
-import ru.yandex.practicum.filmorate.dal.mappers.RatesRowMapper;
+import ru.yandex.practicum.filmorate.dal.*;
+import ru.yandex.practicum.filmorate.dal.mappers.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Rates;
 
@@ -29,7 +23,9 @@ import static ru.yandex.practicum.filmorate.utils.GenerateTestData.generateNewFi
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Import({FilmDbStorage.class, GenresDbStorage.class, LikesDbStorage.class, RatesDbStorage.class,
-        FilmRowMapper.class, GenresRowMapper.class, LikesRowMapper.class, RatesRowMapper.class})
+        FilmRowMapper.class, GenresRowMapper.class, LikesRowMapper.class, RatesRowMapper.class,
+        DirectorDbStorage.class, DirectorsFilmsDbStorage.class, DirectorsRowMapper.class,
+        UserDbStorage.class, UserRowMapper.class})
 class RatesDBStorageTests {
     private final RatesDbStorage ratesStorage;
     private final FilmDbStorage filmStorage;

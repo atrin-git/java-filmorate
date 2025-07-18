@@ -19,6 +19,7 @@ public class GenresDbStorage extends BaseDbStorage<Genre> implements GenresStora
     private static final String FIND_FILM_GENRES_QUERY = "SELECT * FROM genres g " +
             "WHERE id IN (SELECT genre_id FROM genres_on_films gof WHERE gof.film_id = ?)";
     private static final String INSERT_GENRES_QUERY = "INSERT INTO genres_on_films (genre_id, film_id) VALUES (?, ?)";
+    private static final String DELETE_GENRES_QUERY = "DELETE FROM genres_on_films WHERE film_id = ?";
 
     public GenresDbStorage(JdbcTemplate jdbc, RowMapper<Genre> mapper) {
         super(jdbc, mapper);
@@ -47,12 +48,18 @@ public class GenresDbStorage extends BaseDbStorage<Genre> implements GenresStora
 
     @Override
     public void setGenresForFilm(long filmId, Collection<Genre> genres) {
-        genres.forEach(genre -> {
-            update(
-                    INSERT_GENRES_QUERY,
-                    genre.getId(),
-                    filmId
-            );
-        });
+        delete(
+                DELETE_GENRES_QUERY,
+                filmId
+        );
+        if (!genres.isEmpty()) {
+            genres.forEach(genre -> {
+                update(
+                        INSERT_GENRES_QUERY,
+                        genre.getId(),
+                        filmId
+                );
+            });
+        }
     }
 }

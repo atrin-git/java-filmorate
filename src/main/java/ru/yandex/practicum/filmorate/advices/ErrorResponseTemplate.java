@@ -1,4 +1,14 @@
 package ru.yandex.practicum.filmorate.advices;
 
-public record ErrorResponseTemplate(String message) {
+import lombok.Data;
+
+@Data
+public class ErrorResponseTemplate {
+
+    private String error;
+
+    public ErrorResponseTemplate(String error) {
+        this.error = error;
+    }
+
 }

@@ -11,15 +11,12 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FilmMapper {
     public static Film mapToFilm(NewFilmRequest request) {
-//        Set<Integer> genres = new HashSet<>();
-//        request.getGenres().forEach(genre -> {
-//            genres.add((int) ((LinkedHashMap) genre).get("id"));
-//        });
 
         return Film.builder()
                 .name(request.getName())
@@ -28,6 +25,7 @@ public final class FilmMapper {
                 .duration(request.getDuration())
                 .rating(request.getMpa())
                 .genres(request.getGenres())
+                .directors(request.getDirectors())
                 .build();
     }
 
@@ -40,6 +38,7 @@ public final class FilmMapper {
                 .duration(request.getDuration())
                 .rating(request.getMpa())
                 .genres(request.getGenres())
+                .directors(request.getDirectors())
                 .build();
     }
 
@@ -60,6 +59,7 @@ public final class FilmMapper {
                 .mpa(film.getRating())
                 .likesByUsers(film.getLikesByUsers())
                 .genres(genres)
+                .directors(film.getDirectors())
                 .build();
     }
 
@@ -79,9 +79,10 @@ public final class FilmMapper {
         if (request.hasRates()) {
             film.setRating(request.getMpa());
         }
-        if (request.hasGenres()) {
-            film.setGenres(request.getGenres());
-        }
+
+        film.setGenres(request.hasGenres() ? request.getGenres() : Set.of());
+        film.setDirectors(request.hasDirectors() ? request.getDirectors() : Set.of());
+
         return film;
     }
 }

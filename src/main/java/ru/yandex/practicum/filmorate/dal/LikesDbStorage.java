@@ -13,7 +13,7 @@ import java.util.Collection;
 @Component("db-likes")
 public class LikesDbStorage extends BaseDbStorage<Likes> implements LikesStorage {
     private static final String FIND_LIKES_ON_FILM_QUERY = "SELECT * FROM likes_on_films WHERE film_id = ?";
-    private static final String INSERT_QUERY = "INSERT INTO likes_on_films (film_id, user_id) VALUES (?, ?)";
+    private static final String INSERT_QUERY = "MERGE INTO likes_on_films (film_id, user_id) VALUES (?, ?)";
     private static final String DELETE_QUERY = "DELETE FROM likes_on_films WHERE film_id = ? AND user_id = ?";
 
     public LikesDbStorage(JdbcTemplate jdbc, RowMapper<Likes> mapper) {

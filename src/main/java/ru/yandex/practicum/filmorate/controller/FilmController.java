@@ -47,6 +47,13 @@ public class FilmController {
         return filmService.update(film);
     }
 
+    @DeleteMapping("/{filmId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long filmId) {
+        log.info("Получен запрос на удаление фильма с id = {}", filmId);
+        filmService.delete(filmId);
+    }
+
     @PutMapping("/{id}/like/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addLike(@PathVariable("id") Long filmId, @PathVariable("userId") Long userId) {
@@ -55,16 +62,38 @@ public class FilmController {
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     public void deleteLike(@PathVariable("id") Long filmId, @PathVariable("userId") Long userId) {
         log.info("Получен запрос на удаление лайка для фильма с id = {}", filmId);
         filmService.deleteLike(filmId, userId);
     }
 
     @GetMapping("/popular")
-    public Collection<FilmDto> getPopularFilms(@RequestParam(name = "count", defaultValue = "10") int count) {
+    public Collection<FilmDto> getPopularFilms(@RequestParam(name = "count", defaultValue = "10") Long count,
+                                               @RequestParam(name = "genreId", required = false) Long genreId,
+                                               @RequestParam(name = "year", required = false) Long year) {
         log.info("Получен запрос на список популярных фильмов в количестве {} шт.", count);
-        return filmService.getPopularFilms(count);
+        return filmService.getPopularFilms(count, genreId, year);
     }
 
+    @GetMapping("/common")
+    public Collection<FilmDto> getCommonFilms(@RequestParam(value = "userId") Long userId,
+                                              @RequestParam(value = "friendId") Long friendId) {
+        log.info("Получен запрос на список общих фильмов двух пользователей {} и {} ", userId, friendId);
+        return filmService.getCommonFilms(userId, friendId);
+    }
+
+    @GetMapping("/director/{directorId}")
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<FilmDto> getFilmsByDirector(@PathVariable Long directorId,
+                                                  @RequestParam(required = false) String sortBy) {
+        return filmService.getFilmsByDirector(directorId, sortBy);
+    }
+
+    @GetMapping("/search")
+    public Collection<FilmDto> searchFilmsByDirectorOrTitle(@RequestParam(value = "query") String substring,
+                                                            @RequestParam(value = "by") String by) {
+        log.info("Получен запрос на поиск фильмов. Подстрока: \"{}\". Значение параметра by \"{}\"", substring, by);
+        return filmService.searchFilmsByDirectorOrTitle(substring, by);
+    }
 }

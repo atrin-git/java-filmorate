@@ -24,8 +24,10 @@ import static ru.yandex.practicum.filmorate.utils.GenerateTestData.generateNewUs
 @JdbcTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@Import({FilmDbStorage.class, GenresDbStorage.class, LikesDbStorage.class, RatesDbStorage.class, UserDbStorage.class,
-        FilmRowMapper.class, GenresRowMapper.class, LikesRowMapper.class, RatesRowMapper.class, UserRowMapper.class})
+@Import({FilmDbStorage.class, GenresDbStorage.class, LikesDbStorage.class, RatesDbStorage.class,
+        FilmRowMapper.class, GenresRowMapper.class, LikesRowMapper.class, RatesRowMapper.class,
+        DirectorDbStorage.class, DirectorsFilmsDbStorage.class, DirectorsRowMapper.class,
+        UserDbStorage.class, UserRowMapper.class})
 class LikesDBStorageTests {
     private final LikesDbStorage likesStorage;
     private final FilmDbStorage filmStorage;
