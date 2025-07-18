@@ -55,8 +55,9 @@ public class FilmService {
     }
 
     public FilmDto find(Long filmId) {
-        if (filmId == null || filmId < 1)
+        if (filmId == null || filmId < 1) {
             throw new ValidationException("Указан некорректный id пользователя");
+        }
         return filmStorage.find(filmId)
                 .map(FilmMapper::mapToFilmDto)
                 .orElseThrow(() -> {

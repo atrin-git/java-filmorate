@@ -52,8 +52,9 @@ public class UserService {
     }
 
     public UserDto find(Long userId) {
-        if (userId == null || userId < 1)
+        if (userId == null || userId < 1) {
             throw new ValidationException("Указан некорректный id пользователя");
+        }
         return userStorage.find(userId)
                 .map(UserMapper::mapToUserDto)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + userId));
@@ -86,8 +87,9 @@ public class UserService {
     }
 
     public void delete(Long userId) {
-        if (userId == null || userId < 1)
+        if (userId == null || userId < 1) {
             throw new ValidationException("Указан некорректный id пользователя");
+        }
         userStorage.find(userId)
                 .orElseThrow(() -> {
                     log.warn("Не найден пользователь с ID = {}", userId);
