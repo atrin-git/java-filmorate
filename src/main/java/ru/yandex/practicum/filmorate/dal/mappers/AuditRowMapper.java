@@ -30,7 +30,7 @@ public class AuditRowMapper implements RowMapper<Audit> {
 
         return Audit.builder()
                 .id(resultSet.getLong("id"))
-                .timestamp(resultSet.getTimestamp("timestamp").toInstant())
+                .timestamp(resultSet.getTimestamp("create_time").toInstant())
                 .userId(resultSet.getLong("user_id"))
                 .event(event)
                 .operation(operation)

@@ -79,16 +79,10 @@ public final class FilmMapper {
         if (request.hasRates()) {
             film.setRating(request.getMpa());
         }
-        if (request.hasGenres()) {
-            film.setGenres(request.getGenres());
-        } else {
-            film.setGenres(Set.of());
-        }
-        if (request.hasDirectors()) {
-            film.setDirectors(request.getDirectors());
-        } else {
-            film.setDirectors(Set.of());
-        }
+
+        film.setGenres(request.hasGenres() ? request.getGenres() : Set.of());
+        film.setDirectors(request.hasDirectors() ? request.getDirectors() : Set.of());
+
         return film;
     }
 }

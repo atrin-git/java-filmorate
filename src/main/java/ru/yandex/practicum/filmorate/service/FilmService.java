@@ -2,10 +2,9 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.aspects.Auditable;
-import ru.yandex.practicum.filmorate.dal.DirectorsFilmsDbStorage;
+import ru.yandex.practicum.filmorate.dal.*;
 import ru.yandex.practicum.filmorate.dto.FilmDto;
 import ru.yandex.practicum.filmorate.dto.NewFilmRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
@@ -16,37 +15,29 @@ import ru.yandex.practicum.filmorate.model.Events;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Operations;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.model.validation.FilmValidator;
-import ru.yandex.practicum.filmorate.storage.*;
 
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.Set;
 
+import static ru.yandex.practicum.filmorate.model.validation.FilmValidator.checkFilmIsValid;
+
 @Slf4j
 @Service
 public class FilmService {
     @Autowired
-    @Qualifier("db-films")
-    private FilmStorage filmStorage;
+    private FilmDbStorage filmStorage;
     @Autowired
-    @Qualifier("db")
-    private UserStorage userStorage;
+    private UserDbStorage userStorage;
     @Autowired
-    @Qualifier("db-genres")
-    private GenresStorage genresStorage;
+    private GenresDbStorage genresStorage;
     @Autowired
-    @Qualifier("db-likes")
-    private LikesStorage likeStorage;
+    private LikesDbStorage likeStorage;
     @Autowired
-    @Qualifier("db-rates")
-    private RatesStorage ratesStorage;
+    private RatesDbStorage ratesStorage;
     @Autowired
-    @Qualifier("db-directorsFilms")
     private DirectorsFilmsDbStorage directorsFilmsDbStorage;
-    @Autowired
-    private FilmValidator filmValidator;
 
     public Collection<FilmDto> findAll() {
         return filmStorage.getAll().stream()
@@ -69,7 +60,7 @@ public class FilmService {
 
     public FilmDto create(NewFilmRequest newFilm) {
         Film film = FilmMapper.mapToFilm(newFilm);
-        filmValidator.checkFilmIsValid(film);
+        checkFilmIsValid(film);
 
         if (film.getGenres() != null) {
             film.getGenres().forEach(genre -> {
@@ -97,7 +88,7 @@ public class FilmService {
 
     public FilmDto update(UpdateFilmRequest updateFilm) {
         Film film = FilmMapper.mapToFilm(updateFilm);
-        filmValidator.checkFilmIsValid(film);
+        checkFilmIsValid(film);
 
         Film oldFilm = filmStorage.find(updateFilm.getId())
                 .orElseThrow(() -> {
@@ -187,10 +178,16 @@ public class FilmService {
                 .peek(filmStorage::addGenresAndLikes)
                 .map(FilmMapper::mapToFilmDto)
                 .toList();
+
         if (result.isEmpty()) {
             log.warn("Не найдено фильмов с режиссёром {}", directorId);
             throw new NotFoundException("Не найдено фильмов с режиссёром ID = " + directorId);
         }
+
+        if (sortBy == null || sortBy.isEmpty()) {
+            return result;
+        }
+
         switch (sortBy) {
             case "year" -> {
                 return result.stream().sorted(Comparator.comparing(FilmDto::getReleaseDate))
@@ -201,7 +198,7 @@ public class FilmService {
                         .toList();
             }
             default -> {
-                return null;
+                throw new ValidationException("Возможные значения сортировки sortBy: year, likes");
             }
         }
     }

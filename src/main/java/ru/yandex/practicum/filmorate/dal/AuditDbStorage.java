@@ -17,7 +17,7 @@ import java.util.Collection;
 public class AuditDbStorage extends BaseDbStorage<Audit> implements AuditStorage {
 
     private static final String QUERY_GET_ALL_EVENTS_FOR_USER = "SELECT * FROM audit WHERE user_id = ?";
-    private static final String QUERY_ADD_NEW_EVENT = "INSERT INTO audit (timestamp, user_id, event_id, operation_id, entity_id) " +
+    private static final String QUERY_ADD_NEW_EVENT = "INSERT INTO audit (create_time, user_id, event_id, operation_id, entity_id) " +
             "VALUES (NOW(), ?, ?, ?, ?)";
 
     public AuditDbStorage(JdbcTemplate jdbc, RowMapper<Audit> mapper) {

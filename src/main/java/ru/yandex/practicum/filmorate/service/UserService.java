@@ -2,9 +2,12 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.aspects.Auditable;
+import ru.yandex.practicum.filmorate.dal.AuditDbStorage;
+import ru.yandex.practicum.filmorate.dal.FilmDbStorage;
+import ru.yandex.practicum.filmorate.dal.FriendsDbStorage;
+import ru.yandex.practicum.filmorate.dal.UserDbStorage;
 import ru.yandex.practicum.filmorate.dto.*;
 import ru.yandex.practicum.filmorate.dto.mappers.AuditMapper;
 import ru.yandex.practicum.filmorate.dto.mappers.FilmMapper;
@@ -16,34 +19,25 @@ import ru.yandex.practicum.filmorate.model.Events;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Operations;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.model.validation.UserValidator;
-import ru.yandex.practicum.filmorate.storage.AuditStorage;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.FriendsStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static ru.yandex.practicum.filmorate.model.validation.UserValidator.checkUserIsValid;
+
 @Slf4j
 @Service
 public class UserService {
     @Autowired
-    @Qualifier("db")
-    private UserStorage userStorage;
+    private UserDbStorage userStorage;
     @Autowired
-    @Qualifier("db-films")
-    private FilmStorage filmStorage;
+    private FilmDbStorage filmStorage;
     @Autowired
-    @Qualifier("db-friends")
-    private FriendsStorage friendStorage;
+    private FriendsDbStorage friendStorage;
     @Autowired
-    @Qualifier("db-audit")
-    private AuditStorage auditStorage;
-    @Autowired
-    private UserValidator userValidator;
+    private AuditDbStorage auditStorage;
 
     public Collection<UserDto> findAll() {
         return userStorage.getAll().stream()
@@ -62,7 +56,7 @@ public class UserService {
 
     public UserDto create(NewUserRequest newUser) {
         User user = UserMapper.mapToUser(newUser);
-        userValidator.checkUserIsValid(user);
+        checkUserIsValid(user);
         Collection<User> users = userStorage.getAll();
 
         if (users.stream().map(User::getEmail).collect(Collectors.toSet()).contains(user.getEmail())) {
@@ -76,7 +70,7 @@ public class UserService {
 
     public UserDto update(UpdateUserRequest updateUser) {
         User user = UserMapper.mapToUser(updateUser);
-        userValidator.checkUserIsValid(user);
+        checkUserIsValid(user);
 
         User oldUser = userStorage.find(updateUser.getId())
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + updateUser.getId()));
