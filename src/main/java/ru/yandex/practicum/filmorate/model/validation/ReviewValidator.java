@@ -3,12 +3,10 @@ package ru.yandex.practicum.filmorate.model.validation;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
 
 @Slf4j
-@Component
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReviewValidator {
     public static void checkReviewIsValid(Review review) {
