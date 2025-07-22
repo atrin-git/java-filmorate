@@ -1,12 +1,11 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.dto.NewUserRequest;
-import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
-import ru.yandex.practicum.filmorate.dto.UserDto;
+import ru.yandex.practicum.filmorate.dto.*;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
@@ -27,6 +26,12 @@ public class UserController {
         return userService.findAll();
     }
 
+    @GetMapping("/{userId}")
+    public UserDto findById(@PathVariable Long userId) {
+        log.info("Получен запрос на получения пользователя с id: {}", userId);
+        return userService.find(userId);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto create(@RequestBody NewUserRequest user) {
@@ -40,6 +45,13 @@ public class UserController {
         log.info("Получен запрос на обновление пользователя с id = {}", user.getId());
         clearStringData(user);
         return userService.update(user);
+    }
+
+    @DeleteMapping("/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long userId) {
+        log.info("Получен запрос на удаление пользователя с id = {}", userId);
+        userService.delete(userId);
     }
 
     @GetMapping("/{id}/friends")
@@ -68,5 +80,18 @@ public class UserController {
         return userService.findCommonFriends(userId, friendId);
     }
 
+    @GetMapping("/{id}/feed")
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<AuditDto> getFeed(@PathVariable("id") @NotNull Long userId) {
+        log.info("Получен запрос на ленту событий пользователя с ID = {}", userId);
+        return userService.getFeed(userId);
+    }
+
+
+    @GetMapping("{id}/recommendations")
+    public Collection<FilmDto> getRecommendations(@PathVariable("id") Long userId) {
+        log.info("Получен запрос на получение рекомендуемых фильмов пользователю {}", userId);
+        return userService.getRecommendedFilms(userId);
+    }
 
 }

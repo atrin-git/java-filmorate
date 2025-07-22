@@ -2,35 +2,42 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dto.NewUserRequest;
-import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
-import ru.yandex.practicum.filmorate.dto.UserDto;
+import ru.yandex.practicum.filmorate.aspects.Auditable;
+import ru.yandex.practicum.filmorate.dal.AuditDbStorage;
+import ru.yandex.practicum.filmorate.dal.FilmDbStorage;
+import ru.yandex.practicum.filmorate.dal.FriendsDbStorage;
+import ru.yandex.practicum.filmorate.dal.UserDbStorage;
+import ru.yandex.practicum.filmorate.dto.*;
+import ru.yandex.practicum.filmorate.dto.mappers.AuditMapper;
+import ru.yandex.practicum.filmorate.dto.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.dto.mappers.UserMapper;
 import ru.yandex.practicum.filmorate.exception.DuplicateException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Events;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Operations;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.model.validation.UserValidator;
-import ru.yandex.practicum.filmorate.storage.FriendsStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static ru.yandex.practicum.filmorate.model.validation.UserValidator.checkUserIsValid;
+
 @Slf4j
 @Service
 public class UserService {
     @Autowired
-    @Qualifier("db")
-    private UserStorage userStorage;
+    private UserDbStorage userStorage;
     @Autowired
-    @Qualifier("db-friends")
-    private FriendsStorage friendStorage;
+    private FilmDbStorage filmStorage;
     @Autowired
-    private UserValidator userValidator;
+    private FriendsDbStorage friendStorage;
+    @Autowired
+    private AuditDbStorage auditStorage;
 
     public Collection<UserDto> findAll() {
         return userStorage.getAll().stream()
@@ -38,15 +45,18 @@ public class UserService {
                 .toList();
     }
 
-    public UserDto find(Long id) {
-        return userStorage.find(id)
+    public UserDto find(Long userId) {
+        if (userId == null || userId < 1) {
+            throw new ValidationException("Указан некорректный id пользователя");
+        }
+        return userStorage.find(userId)
                 .map(UserMapper::mapToUserDto)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + id));
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + userId));
     }
 
     public UserDto create(NewUserRequest newUser) {
         User user = UserMapper.mapToUser(newUser);
-        userValidator.checkUserIsValid(user);
+        checkUserIsValid(user);
         Collection<User> users = userStorage.getAll();
 
         if (users.stream().map(User::getEmail).collect(Collectors.toSet()).contains(user.getEmail())) {
@@ -60,7 +70,7 @@ public class UserService {
 
     public UserDto update(UpdateUserRequest updateUser) {
         User user = UserMapper.mapToUser(updateUser);
-        userValidator.checkUserIsValid(user);
+        checkUserIsValid(user);
 
         User oldUser = userStorage.find(updateUser.getId())
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + updateUser.getId()));
@@ -68,6 +78,19 @@ public class UserService {
         user = UserMapper.updateUserFields(oldUser, updateUser);
 
         return UserMapper.mapToUserDto(userStorage.update(user));
+    }
+
+    public void delete(Long userId) {
+        if (userId == null || userId < 1) {
+            throw new ValidationException("Указан некорректный id пользователя");
+        }
+        userStorage.find(userId)
+                .orElseThrow(() -> {
+                    log.warn("Не найден пользователь с ID = {}", userId);
+                    return new NotFoundException("Пользователь не найден с ID: " + userId);
+                });
+
+        userStorage.delete(userId);
     }
 
     public Collection<UserDto> getFriends(Long userId) {
@@ -80,6 +103,7 @@ public class UserService {
                 .toList();
     }
 
+    @Auditable(eventName = Events.FRIEND, operationName = Operations.ADD, userId = "#userId", entityId = "#friendId")
     public void addFriend(Long userId, Long friendId) {
         final User user = userStorage.find(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + userId));
@@ -100,6 +124,7 @@ public class UserService {
         friendStorage.addFriend(user, friend);
     }
 
+    @Auditable(eventName = Events.FRIEND, operationName = Operations.REMOVE, userId = "#userId", entityId = "#friendId")
     public void deleteFriend(Long userId, Long friendId) {
         final User user = userStorage.find(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + userId));
@@ -134,6 +159,26 @@ public class UserService {
         return userStorage.getAll().stream()
                 .filter(u -> intersection.contains(u.getId()))
                 .map(UserMapper::mapToUserDto)
+                .toList();
+    }
+
+    public Collection<FilmDto> getRecommendedFilms(Long userId) {
+        Collection<Film> films = filmStorage.getRecommendedFilms(userId);
+        return films.stream()
+                .map(FilmMapper::mapToFilmDto)
+                .toList();
+    }
+
+    public Collection<AuditDto> getFeed(Long userId) {
+        if (userId < 1) {
+            log.warn("Передан ID = {} меньше 1", userId);
+            throw new ValidationException("Идентификатор пользователя не может быть менее 1.");
+        }
+
+        find(userId);
+
+        return auditStorage.getEventsForUser(userId).stream()
+                .map(AuditMapper::mapToAuditDto)
                 .toList();
     }
 

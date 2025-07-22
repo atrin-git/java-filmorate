@@ -103,5 +103,4 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
 
         return users;
     }
-
 }

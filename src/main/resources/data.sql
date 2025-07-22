@@ -16,3 +16,18 @@ VALUES
     (4, 'R'),
     (5, 'NC-17')
 ;
+
+MERGE INTO EVENTS (ID, CODE)
+VALUES
+    (1, 'LIKE'),
+    (2, 'REVIEW'),
+    (3, 'FRIEND')
+;
+
+
+MERGE INTO OPERATIONS (ID, CODE)
+VALUES
+    (1, 'REMOVE'),
+    (2, 'ADD'),
+    (3, 'UPDATE')
+;
